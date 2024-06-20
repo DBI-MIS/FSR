@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\Auth\CustomLogin;
 use App\Filament\Resources\FsrResource\Widgets\FsrOverview;
 use App\Filament\Resources\FsrResource\Widgets\LatestFsr;
+use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -39,7 +40,8 @@ class AdminPanelProvider extends PanelProvider
             ->breadcrumbs(false)
             ->topbar(true)
             ->maxContentWidth(MaxWidth::Full)
-            ->font('Poppins')
+            ->defaultThemeMode(ThemeMode::Light)
+            ->font('Lato')
             ->darkMode(false)
             // ->brandName('FSR')
             ->colors([
