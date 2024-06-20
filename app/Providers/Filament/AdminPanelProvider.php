@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Auth\CustomLogin;
 use App\Filament\Resources\FsrResource\Widgets\FsrOverview;
 use App\Filament\Resources\FsrResource\Widgets\LatestFsr;
 use Filament\Http\Middleware\Authenticate;
@@ -30,7 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('/')
-            ->login()
+            ->login(CustomLogin::class)
             ->spa()
             ->sidebarFullyCollapsibleOnDesktop()
             ->sidebarCollapsibleOnDesktop()
