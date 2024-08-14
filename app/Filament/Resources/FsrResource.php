@@ -30,6 +30,9 @@ use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Infolists\Components\Component;
+use Filament\Infolists\Components\Section as ComponentsSection;
+use Filament\Infolists\Components\Split as ComponentsSplit;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\MaxWidth;
@@ -52,44 +55,46 @@ use Illuminate\Support\HtmlString;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Support\Enums\FontWeight;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\View;
+use Filament\Infolists\Infolist;
 use Filament\Notifications\Collection;
 use Filament\Resources\RelationManagers\RelationGroup;
+use Filament\Tables\Columns\Layout\View as LayoutView;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\QueryBuilder;
+use Filament\Tables\Filters\QueryBuilder\Constraints\NumberConstraint;
 use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Support\Facades\Auth;
 
 class FsrResource extends Resource
 {
     protected static ?string $model = Fsr::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-flag';
 
     protected static ?int $navigationSort = 1;
 
     public static function getNavigationBadge(): ?string
-{
-    return static::getModel()::count();
-}
+    {
+        return static::getModel()::count();
+    }
 
-protected static ?string $navigationGroup = 'FSR';
+    protected static ?string $navigationGroup = 'FSR';
+
+    protected static ?string $label = 'Field Service Report';
 
     use CreateRecord\Concerns\HasWizard;
 
-    // protected function getSteps(): array
-    // {
 
-    // public static function canCreate(): bool
-    //    {
-    //       return false;
-    //    }    
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Wizard::make([
-//////////////////////////////////////////////////////////////////////////////////            
-                    Step::make('FSR Details')
+                    //////////////////////////////////////////////////////////////////////////////////            
+                    Wizard\Step::make('FSR Details')
                         ->description(' ')
                         ->columns(4)
                         ->schema([
@@ -106,6 +111,7 @@ protected static ?string $navigationGroup = 'FSR';
                                 ->searchable()
                                 ->columnSpan(2)
                                 ->preload()
+                                ->nullable()
                                 ->createOptionForm([
                                     TextInput::make('name')->autocapitalize('words'),
                                     ToggleButtons::make('warranty')->inline()
@@ -141,8 +147,8 @@ protected static ?string $navigationGroup = 'FSR';
                             TimePicker::make('time_completed')
                                 ->label('Time Completed')
                                 ->nullable(),
-                            
-                            
+
+
 
                             Select::make('attended_to')
                                 ->options([
@@ -185,32 +191,30 @@ protected static ?string $navigationGroup = 'FSR';
                                 ]),
 
                         ]),
-//////////////////////////////////////////////////////////////////////////////////////////////////
-                    Step::make('Equipment')
+                    //////////////////////////////////////////////////////////////////////////////////////////////////
+                    Wizard\Step::make('Equipment')
                         ->description('Status')
                         ->columns(4)
                         ->schema([
                             Select::make('equipments')
-                            ->columnSpan(4)
-                            ->multiple()
-                            ->nullable()
-                            ->relationship('equipments', 'model')
-                            ->searchable()
-                            ->preload()
-                            
+                                ->label(' ')
+                                ->columnSpan(4)
+                                ->multiple()
+                                ->relationship('equipments', 'model')
+                                ->searchable()
+                                ->nullable()
                                 ->createOptionForm([
                                     TextInput::make('brand')
-                                    ->nullable(),
+                                        ->nullable(),
                                     TextInput::make('model')
-                                    ->required(),
+                                        ->required(),
                                     TextInput::make('serial')
-                                    ->nullable(),
+                                        ->nullable(),
                                     Textarea::make('description')
                                         ->columnSpanFull()
                                         ->nullable()
                                         ->rows(3),
                                 ])->createOptionModalHeading('Create New Equipment'),
-
                             Fieldset::make('Voltage')
                                 ->columns(3)
                                 ->schema([
@@ -244,13 +248,13 @@ protected static ?string $navigationGroup = 'FSR';
                                         ->suffix('A')
                                         ->label(' '),
                                 ])->columnSpan(2),
-                                Fieldset::make(' ')
+                            Fieldset::make(' ')
                                 ->columns(3)
                                 ->schema([
-                            TextInput::make('voltage_imbalance')->nullable(),
-                            TextInput::make('current_imbalance')->nullable(),
-                            TextInput::make('control_voltage')->nullable(),
-                            ])->columnSpan(4),
+                                    TextInput::make('voltage_imbalance')->nullable(),
+                                    TextInput::make('current_imbalance')->nullable(),
+                                    TextInput::make('control_voltage')->nullable(),
+                                ])->columnSpan(4),
                             MarkdownEditor::make('service_rendered')
                                 ->nullable()
                                 ->columnSpan(4)
@@ -271,8 +275,8 @@ protected static ?string $navigationGroup = 'FSR';
                                 ]),
 
                         ]),
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    Step::make('Log Readings-1')
+                    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    Wizard\Step::make('Log Readings-1')
                         ->description(' ')
                         ->schema([
 
@@ -442,12 +446,12 @@ protected static ?string $navigationGroup = 'FSR';
                                 ])->columnSpan(2),
 
                         ]),
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    Step::make('Log Readings-2')
+                    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    Wizard\Step::make('Log Readings-2')
                         ->description(' ')
                         ->columns(2)
                         ->schema([
-                            
+
                             Fieldset::make(' ')
                                 ->columns(4)
                                 ->schema([
@@ -522,10 +526,10 @@ protected static ?string $navigationGroup = 'FSR';
                                 ]),
 
 
-                            
+
                         ]),
-////////////////////////////////////////////////////////////////////////////////////////////////
-                    Step::make('Recommendations')
+                    ////////////////////////////////////////////////////////////////////////////////////////////////
+                    Wizard\Step::make('Recommendations')
                         ->columns(4)
                         ->schema([
                             Select::make('replacements')
@@ -577,8 +581,8 @@ protected static ?string $navigationGroup = 'FSR';
                                 ])
                                 ->columnSpan(4),
                         ]),
-///////////////////////////////////////////////////////////////////////////////////////////////////
-Step::make('Customer Satisfaction')
+                    ///////////////////////////////////////////////////////////////////////////////////////////////////
+                    Wizard\Step::make('Customer Satisfaction')
                         ->columns(4)
                         ->schema([
                             MarkdownEditor::make('response_time')
@@ -651,29 +655,32 @@ Step::make('Customer Satisfaction')
                                 ->nullable()
                                 ->columnSpan(3),
 
-                                Select::make('user_id')
+                            Select::make('user_id')
+                                ->disabled()
                                 ->relationship('author', 'name')
-                                ->searchable()
+                                ->default(Auth::user()->id)
+                                // ->hidden()
+                                // ->searchable()
                                 ->required()
                                 ->preload()
+                                // ->readOnly()
                                 ->columnSpan(1),
                         ]),
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+                    ///////////////////////////////////////////////////////////////////////////////////////////////////
                 ])
-                ->skippable()
-                ->columnSpanFull()
-                // ->submitAction(new HtmlString('<button type="submit">Submit</button>'))
+                    ->skippable()
+                    ->columnSpanFull()
 
-                ->submitAction(new HtmlString(Blade::render(<<<BLADE
-            <x-filament::button
-                type="submit"
-                size="xl"
-            >
-                Submit
-            </x-filament::button>
-        BLADE)))
-        ,
+                    ->submitAction(new HtmlString(Blade::render(<<<BLADE
+                                <x-filament::button
+                                    type="submit"
+                                    size="xl"
+                                >
+                                    Submit
+                                </x-filament::button>
+                            BLADE))),
+
             ]);
     }
 
@@ -681,121 +688,26 @@ Step::make('Customer Satisfaction')
     {
         return $table
             ->recordUrl(null)
-            ->heading('Field Service Reports')
+            ->heading('FSR List')
+            ->description('Click the funnel to filter the list.')
             ->defaultPaginationPageOption(25)
             ->deferLoading()
+            // ->searchable()
             ->striped()
             ->columns([
-                Grid::make([
-                    'sm' => 5,
-                ])
-                    ->schema([
-                        
-                            TextColumn::make('job_date_started')
-                                ->default('No Data')
-                                ->since()
-                                ->sortable()
-                                ->searchable()
-                                ->label('Date')
-                                ->alignment(Alignment::Center)
-                                ->grow(false),
-                            TextColumn::make('fsr_no')
-                                ->default('No Data')
-                                ->sortable()
-                                ->searchable()
-                                ->weight(FontWeight::Bold)
-                                ->grow(false)
-                                ->alignment(Alignment::Center)
-                                ->label('FSR No.'),
-                                // ->formatStateUsing(fn (Column $column, $state): string => $column->getLabel() . ' ' . $state),
-                            TextColumn::make('project.name',)
-                                ->default('No Data')
-                                ->sortable()
-                                ->searchable()
-                                ->grow(false)
-                                ->alignment(Alignment::Start)
-                                ->label('Project'),
-                                // ->formatStateUsing(fn (Column $column, $state): string => $column->getLabel() . ': ' . $state),
-                            TextColumn::make('attended_to')
-                                ->default('No Data')
-                                ->searchable()
-                                ->badge()
-                                ->grow(false)
-                                ->label('Service Type')->columnSpan(2)
-                        ,
+                LayoutView::make('filament.table.row-content')
+                    ->components([
+                        TextColumn::make('attended_to')
+                            ->badge()
+                            ->icon('heroicon-m-wrench'),
+                    ]),
+                LayoutView::make('filament.table.collapsible-row-content')
+                    ->collapsible(),
 
-                    
-                        // Stack::make([
-                        //         TextColumn::make('service_rendered')
-                        //             ->searchable()
-                        //             ->label('SERVICE RENDERED')
-                        //             // ->size(TextEntry\TextEntrySize::Large)
-                        //             // ->wrap()
-                        //             ->lineClamp(4)
-                        //             ->listWithLineBreaks()
-                        //             ->grow(false)
-                        //             ->formatStateUsing(fn (Column $column, $state): string => $column->getLabel() . ': ' . $state),
-                        //             // ->description(fn (Fsr $record): string => $record->service_rendered),
-
-                        //             TextColumn::make('concerns')
-                        //             ->searchable()
-                        //             ->label('CONCERNS')
-                        //             // ->wrap()
-                        //             ->lineClamp(4)
-                        //             ->listWithLineBreaks()
-                        //             ->grow(false)
-                        //             ->formatStateUsing(fn (Column $column, $state): string => $column->getLabel() . ': ' . $state),
-
-                        //             TextColumn::make('recommendation')
-                        //             ->searchable()
-                        //             ->label('RECOMMENDATION')
-                        //             // ->wrap()
-                        //             ->lineClamp(4)
-                        //             ->listWithLineBreaks()
-                        //             ->grow(false)
-                        //             ->formatStateUsing(fn (Column $column, $state): string => $column->getLabel() . ': ' . $state),
-                            
-                        // ])  ->space(2)->grow(true)->columnSpan(4),
-
-                        ]),
-                    Panel::make([
-                    Stack::make([
-                        TextColumn::make('service_rendered')
-                                    ->default('No Data')
-                                    ->searchable()
-                                    ->label('SERVICE RENDERED')
-                                    // ->size(TextEntry\TextEntrySize::Large)
-                                    // ->wrap()
-                                   
-                                    ->listWithLineBreaks()
-                                    ->grow(false)
-                                    ->formatStateUsing(fn (Column $column, $state): string => $column->getLabel() . ': ' . $state),
-                                    // ->description(fn (Fsr $record): string => $record->service_rendered),
-
-                                    TextColumn::make('concerns')
-                                    ->default('No Data')
-                                    ->searchable()
-                                    ->label('CONCERNS')
-                                    // ->wrap()
-                                
-                                    ->listWithLineBreaks()
-                                    ->grow(false)
-                                    ->formatStateUsing(fn (Column $column, $state): string => $column->getLabel() . ': ' . $state),
-
-                                    TextColumn::make('recommendation')
-                                    ->default('No Data')
-                                    ->searchable()
-                                    ->label('RECOMMENDATION')
-                                    // ->wrap()
-                                    
-                                    ->listWithLineBreaks()
-                                    ->grow(false)
-                                    ->formatStateUsing(fn (Column $column, $state): string => $column->getLabel() . ': ' . $state),
-                            
-                    ])
-                    ])->collapsible()->grow(true)->columnSpan(4),
-            
-
+            ])
+            ->contentGrid([
+                'md' => 2,
+                'xl' => 3,
             ])
             ->defaultSort('fsr_no', 'desc')
             ->persistSortInSession()
@@ -803,41 +715,69 @@ Step::make('Customer Satisfaction')
             ->persistColumnSearchesInSession()
 
             ->filters([
+                Filter::make('fsr_no')
+                    ->form([
+                        TextInput::make('fsr_no')->label('FSR No.')
+                            ->helperText('Search FSR No. only'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (!empty($data['fsr_no'])) {
+                            $fsrNo = $data['fsr_no'];
+                            return $query->where('fsr_no', 'like', '%' . $fsrNo . '%');
+                        }
+                        return $query;
+                    }),
 
-                SelectFilter::make('project_id')
-                ->label('Project/Client')
-                ->relationship('project', 'name')
-                ->multiple()
-                ->preload()
-                ->searchable(),
 
-                // SelectFilter::make('attended_to')
-                // ->options([
-                //     'Preventive Maintenance' => 'Preventive Maintenance',
-                //     'Trouble Call' => 'Trouble Call',
-                //     'Check Up' => 'Check-up',
-                //     'Evaluation' => 'Evaluation',
-                //     'Start Up' => 'Start Up',
-                //     'Testing' => 'Testing',
-                //     'Commissioning' => 'Commissioning',
-                //     'Monitoring' => 'Monitoring',
-                //     'Site Inspection' => 'Site Inspection',
-                //     'Operatorship' => 'Operatorship',
-                //     'Parts/Installation' => 'Parts/Installation',
-                //     'Repair/Modification' => 'Repair/Modification',
-                //     'Hauling' => 'Hauling',
-                //     'Delivery' => 'Delivery',
-                //     'Others' => 'Others',
+                // Filter::make('job_date_started')
+                // ->form([
+                //     DatePicker::make('created_from'),
+                //     DatePicker::make('created_until'),
                 // ])
-                // ->label('FSR Type')
-                // ->multiple()
-                // ->searchable()
+                // ->query(function (Builder $query, array $data): Builder {
+                //     return $query
+                //         ->when(
+                //             $data['created_from'],
+                //             fn (Builder $query, $date): Builder => $query->whereDate('job_date_started', '>=', $date),
+                //         )
+                //         ->when(
+                //             $data['created_until'],
+                //             fn (Builder $query, $date): Builder => $query->whereDate('job_date_started', '<=', $date),
+                //         );
+                // })
+                // ->query(function (Builder $query, array $data): Builder {
+                //     if (!empty($data['job_date_started'])) {
+                //         $date = $data['job_date_started'];
+                //         return $query->whereDate('job_date_started', $date);
+                //     }
+                //     return $query;
+                // }),
+                Filter::make('attended_to')
+                    ->form([
+                        TextInput::make('attended_to')->label('FSR Type')
+                            ->helperText('ex.: Preventive Maintenance, Trouble Call or Hauling'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (!empty($data['attended_to'])) {
+                            $fsrNo = $data['attended_to'];
+                            return $query->where('attended_to', 'like', '%' . $fsrNo . '%');
+                        }
+                        return $query;
+                    }),
+                SelectFilter::make('project_id')
 
-                ],layout: FiltersLayout::AboveContentCollapsible)
-                ->filtersFormColumns(3)
+                    ->label('Project/Client')
+                    ->relationship('project', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
+
+            ], layout: FiltersLayout::AboveContentCollapsible)
+            ->filtersFormColumns(4)
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\ViewAction::make()->slideOver()->modalWidth(MaxWidth::SixExtraLarge),
+                Tables\Actions\ViewAction::make(),
+                // Tables\Actions\ViewAction::make()->slideOver()->modalWidth(MaxWidth::SixExtraLarge),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -846,15 +786,24 @@ Step::make('Customer Satisfaction')
             ]);
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+
+                View::make('infolists.components.fsr-view')->columnSpanFull()
+            ]);
+    }
+
     public static function getRelations(): array
     {
         return [
 
-           
+
             PersonnelsRelationManager::class,
             EquipmentsRelationManager::class,
             ReplacementsRelationManager::class,
-            
+
         ];
     }
 
@@ -863,6 +812,7 @@ Step::make('Customer Satisfaction')
         return [
             'index' => Pages\ListFsrs::route('/'),
             'create' => Pages\CreateFsr::route('/create'),
+            'view' => Pages\ViewFsr::route('/{record}'),
             'edit' => Pages\EditFsr::route('/{record}/edit'),
         ];
     }

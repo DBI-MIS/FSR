@@ -4,7 +4,7 @@ namespace App\Filament\Resources\EquipmentResource\Pages;
 
 use App\Filament\Resources\EquipmentResource;
 use Filament\Actions;
-use EightyNine\ExcelImport\ExcelImportAction as ExcelImportExcelImportAction;
+use EightyNine\ExcelImport\ExcelImportAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListEquipment extends ListRecords
@@ -14,8 +14,9 @@ class ListEquipment extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            ExcelImportExcelImportAction::make()
-            ->color("primary"),
+            ExcelImportAction::make()
+            ->color("primary")
+            ->slideOver(),
             Actions\CreateAction::make(),
         ];
     }

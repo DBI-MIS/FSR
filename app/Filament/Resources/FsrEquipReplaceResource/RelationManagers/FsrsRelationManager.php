@@ -48,8 +48,7 @@ class FsrsRelationManager extends RelationManager
                 // ->recordSelectSearchColumns(['fsr_no',])
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DetachAction::make(),
+           
                 Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([

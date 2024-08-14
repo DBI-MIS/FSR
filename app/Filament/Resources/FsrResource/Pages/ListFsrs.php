@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\FsrResource\Pages;
 
 use App\Filament\Resources\FsrResource;
+use EightyNine\ExcelImport\ExcelImportAction;
 use Filament\Actions;
-use EightyNine\ExcelImport\ExcelImportAction as ExcelImportExcelImportAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListFsrs extends ListRecords
@@ -14,8 +14,9 @@ class ListFsrs extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            ExcelImportExcelImportAction::make()
-            ->color("primary"),
+            ExcelImportAction::make()
+            ->color("primary")
+            ->slideOver(),
             Actions\CreateAction::make(),
         ];
     }

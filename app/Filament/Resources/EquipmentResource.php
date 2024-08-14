@@ -24,7 +24,7 @@ class EquipmentResource extends Resource
 {
     protected static ?string $model = Equipment::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-archive-box-arrow-down';
 
     protected static ?int $navigationSort = 3;
 
@@ -34,6 +34,8 @@ class EquipmentResource extends Resource
 }
 
 protected static ?string $navigationGroup = 'Equipments';
+
+protected static ?string $label = 'Equipments';
 
     public static function form(Form $form): Form
     {

@@ -21,7 +21,7 @@ class FsrEquipReplaceResource extends Resource
 {
     protected static ?string $model = FsrEquipReplace::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-archive-box-x-mark';
 
     protected static ?int $navigationSort = 5;
 
@@ -29,9 +29,10 @@ class FsrEquipReplaceResource extends Resource
 {
     return static::getModel()::count();
 }
-    protected static ?string $navigationParentItem = 'Equipment';
     
     protected static ?string $navigationGroup = 'Equipments';
+
+    protected static ?string $label = 'Replacement';
 
     // protected static bool $shouldRegisterNavigation = false;
 

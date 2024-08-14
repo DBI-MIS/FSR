@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Filament\Infolists\Infolist;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,6 +11,14 @@ class Project extends Model
 {
     use HasFactory;
 
+     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+
+    // protected $guarded = [];
+    protected $activities;
     protected $fillable = [
         'name',
         'warranty',
@@ -33,5 +42,5 @@ class Project extends Model
     {
         return $this->belongsToMany(Equipment::class, 'equipment_projects')->withPivot(['order'])->withTimestamps();
     }
-
+  
 }

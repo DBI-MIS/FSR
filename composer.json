@@ -7,16 +7,20 @@
     "require": {
         "php": "^8.2",
         "doctrine/dbal": "^3.8",
-        "eightynine/filament-excel-import": "^3.0",
+        "eightynine/filament-excel-import": " 3.0.5",
         "filament/filament": "*",
         "ibrahimbougaoua/filament-rating-star": "^1.0",
+        "jaocero/activity-timeline": "^1.2",
         "joaopaulolndev/filament-general-settings": "^1.0",
         "laravel/breeze": "*",
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
         "livewire/volt": "^1.6",
         "mokhosh/filament-kanban": "^2.8",
-        "spatie/eloquent-sortable": "^4.3"
+        "parallax/filament-comments": "^1.3",
+        "spatie/eloquent-sortable": "^4.3",
+        "spatie/laravel-pdf": "^1.5",
+        "yemenopensource/filament-excel": "^0.1.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

@@ -35,7 +35,7 @@ class CreateFsr extends CreateRecord
     protected function getSteps(): array
     {
         return [
-            Step::make('FSR Details')
+                    Step::make('FSR Details')
                         ->description(' ')
                         ->columns(4)
                         ->schema([
@@ -142,7 +142,7 @@ class CreateFsr extends CreateRecord
                             ->nullable()
                             ->relationship('equipments', 'model')
                             ->searchable()
-                            ->preload()
+                            // ->preload()
                             
                                 ->createOptionForm([
                                     TextInput::make('brand')
@@ -524,7 +524,7 @@ class CreateFsr extends CreateRecord
                                 ->columnSpan(4),
                         ]),
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-Step::make('Customer Satisfaction')
+                    Step::make('Customer Satisfaction')
                         ->columns(4)
                         ->schema([
                             MarkdownEditor::make('response_time')
@@ -599,9 +599,8 @@ Step::make('Customer Satisfaction')
 
                                 Select::make('user_id')
                                 ->relationship('author', 'name')
-                                ->searchable()
-                                ->required()
-                                ->preload()
+                                ->default(auth()->id())
+                                ->disabled()
                                 ->columnSpan(1),
                         ])
                                 ->columnSpanFull()

@@ -24,7 +24,7 @@ class DbePersonnelResource extends Resource
 {
     protected static ?string $model = DbePersonnel::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     protected static ?int $navigationSort = 4;
 
@@ -33,9 +33,9 @@ class DbePersonnelResource extends Resource
     return static::getModel()::count();
 }
 
-protected static ?string $navigationParentItem = 'Fsrs';
-
 protected static ?string $navigationGroup = 'FSR';
+
+protected static ?string $label = 'DBE Personnel';
 
     public static function form(Form $form): Form
     {
