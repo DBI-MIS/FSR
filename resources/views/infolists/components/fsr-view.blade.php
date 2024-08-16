@@ -41,7 +41,8 @@
         @if(is_array($getRecord()->attended_to) || is_object($getRecord()->attended_to))
             @forelse($getRecord()->attended_to as $attended)
                 <span class="text-base font-bold">
-                    {{ is_string($attended) ? 'NA' : ($attended ?? 'NA') }}
+                    {{-- {{ is_string($attended) ? 'NA' : ($attended ?? 'NA') }} --}}
+                    {{ ($attended ?? 'NA') }}
                 </span>
                 @if(!$loop->last),@endif
             @empty

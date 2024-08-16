@@ -1,15 +1,16 @@
 <div class="mx-20">
-    @php
+   
+
+    <div class="max-w-[90%] p-12 bg-white rounded-lg shadow-lg shadow-black/20 mx-auto mb-20">
+        @php
         $sortedFsrs = $getRecord()->fsrs->sortByDesc(function ($fsr) {
             return $fsr->job_date_started;
         });
     @endphp
-
-    <div class="max-w-[90%] p-12 bg-white rounded-lg shadow-lg shadow-black/20 mx-auto mb-20">
         <div class="grid grid-cols-1 md:grid-cols-5 gap-20">
             <!-- Title and Description Section -->
             <div class="col-span-2">
-                <div class="fixed bg-white z-20 p-4 min-h-min">
+                <div class="fixed z-20 p-4 min-h-min" style="max-width: 300px">
                     <span class="text-sm text-gray-700">Project/Client:</span>
                     <h2 class="text-4xl font-bold mb-5 text-gray-900 dark:text-white">{{ $getRecord()->name ?? '-' }}
                     </h2>
@@ -25,11 +26,11 @@
                             $badgeColor = 'bg-gray-400';
 
                             if ($warrantyStatus === 'Under Warranty') {
-                                $badgeColor = 'bg-green-400 text-white';
+                                $badgeColor = 'bg-green-600 text-white';
                             } elseif ($warrantyStatus === 'Out of Warranty') {
-                                $badgeColor = 'bg-red-400 text-white';
+                                $badgeColor = 'bg-red-600 text-white';
                             } elseif ($warrantyStatus === 'In House') {
-                                $badgeColor = 'bg-blue-400 text-white';
+                                $badgeColor = 'bg-blue-600 text-white';
                             }
                         @endphp
 
@@ -47,24 +48,31 @@
                                     return $fsrs->sortByDesc('job_date_started')->first();
                                 });
                         @endphp
-
-                        <h3 class="text-xl font-bold mt-10">Select Year</h3>
-                        <ul>
-                            @foreach ($latestFsrsByYear as $year => $fsr)
-                                <li>
-                                    <a href="#fsr-{{ $fsr->id }}" class="text-blue-600 hover:underline">
-                                        {{ $fsr->job_date_started->format('Y') }}
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
+                   @if ($latestFsrsByYear)
+                   
+                   <ul>
+                       @foreach ($latestFsrsByYear as $year => $fsr)
+                           @if ($fsr->id && $fsr->job_date_started)
+                           <span class="text-sm text-gray-700 w-full block">Go to:</span>
+                               <li class="inline-flex items-center gap-1">
+                                   <div class="w-3">
+                                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" id="Text-Flow-Rows--Streamline-Sharp"><desc>Text Flow Rows Streamline Icon: https://streamlinehq.com</desc><g id="text-flow-rows"><path id="Union" fill="#8fbffa" fill-rule="evenodd" d="M19.3842 2.9749H4.0688V5.1628H16.7434L3.2954 18.6108L1.428 20.4781H18.2902V23.76H19.3842L23.76 19.3842L19.3842 15.0084H18.2902V18.2902H6.7096L20.1576 4.8423L22.025 2.9749H19.3842Z" clip-rule="evenodd" stroke-width="1"></path><path id="Union_2" fill="#2859c5" fill-rule="evenodd" d="M0.24 0.24H7.8977V7.8977H0.24V0.24ZM0.24 15.5553H7.8977V23.213H0.24V15.5553ZM23.213 0.24H15.5553V7.8977H23.213V0.24Z" clip-rule="evenodd" stroke-width="1"></path></g></svg>
+                                   </div>
+                                   <a href="#fsr-{{ $fsr->id }}" class="text-gray-600 font-bold hover:text-blue-600">
+                                       {{ $fsr->job_date_started->format('Y') }}
+                                   </a>
+                               </li>
+                           @endif
+                       @endforeach
+                   </ul>
+               @endif
                     </div>
                 </div>
             </div>
 
             <!-- Timeline Section -->
             <div class="col-span-3 min-h-[500px]">
-                <h1 class="text-2xl font-bold mb-10">FSR Timeline View</h1>
+                <h1 class="text-2xl font-bold mb-10">Timeline View</h1>
                 <ul class="relative border-l-4 border-sky-600">
 
 
@@ -83,29 +91,180 @@
                             </span>
                             <div class="flex flex-col gap-2">
 
+                                <div class="flex flex-row justify-between items-center">
+                                <div class="flex flex-row items-center gap-2">
+                                    <span class="text-sm text-gray-700">FSR No.:</span>
+                                    <span class="text-xl text-gray-700 font-semibold">{{ $fsr->fsr_no }}</span>
+                                </div>
+
                                 <div class="block text-lg font-normal leading-none text-slate-500">
                                     {{ $fsr->job_date_started->format('l - M d, Y') ?? '-' }}</div>
+                                
+                                </div>
                                 <hr>
+
                                 <div class="flex flex-col">
-                                    <span class="text-sm text-gray-700">FSR No.:</span>
-                                    <span class="text-lg text-gray-700 font-semibold">{{ $fsr->fsr_no }}</span>
+                                    
+                                    <details open class="bg-gray-100 px-4 py-2 rounded-md group ">
+                                        <summary class="text-sm text-gray-700 mr-2 cursor-pointer flex justify-between items-center list-none ">
+                                           
+                                            <span>
+                                                Attended To
+                                            </span>
+
+                                            <span class="transition-transform duration-300 ease-in-out group-open:rotate-180">
+                                            <svg fill="none" 
+                                            height="24" 
+                                            shape-rendering="geometricPrecision" 
+                                            stroke="currentColor" 
+                                            stroke-linecap="round" 
+                                            stroke-linejoin="round" 
+                                            stroke-width="1.5" 
+                                            viewBox="0 0 24 24" 
+                                            width="24">
+                                            <path
+                                            d="M6 9l6 6 6-6">
+                                            </path>
+                                            
+                                            </svg>
+                                            </span>
+                                        </summary>
+                                        <div class="flex flex-wrap flex-row gap-1 mt-2">
+                                            @if (is_array($fsr->attended_to))
+                                                @foreach ($fsr->attended_to as $action)
+                                                    <span class="text-sm font-semibold text-center text-white inline-block bg-blue-600 rounded-md px-6 py-1 tracking-wide text-nowrap {{ $loop->last ? 'flex-none' : 'flex-1' }} ">
+                                                        {{ $action ?? 'NA' }}
+                                                    </span>
+                                                    {{-- @if (!$loop->last)
+                                                        @endif --}}
+                                                @endforeach
+                                            @else
+                                                <span class="text-lg font-semibold text-gray-900 inline-block"></span>
+                                            @endif
+                                        </div>
+                                    </details>
+                            
                                 </div>
+
                                 <div class="flex flex-col">
-                                    <span class="text-sm text-gray-700 mr-2">Attended To:</span>
-                                    <div class="flex gap-1">
-                                        @if (is_array($fsr->attended_to) || is_object($fsr->attended_to))
-                                            @foreach ($fsr->attended_to as $action)
-                                                <span class="text-lg font-semibold text-gray-900 inline-block">
-                                                    {{ is_string($action) ? 'NA' : $action ?? 'NA' }}@if (!$loop->last)
-                                                        ,
-                                                    @endif
+                                    @if ($fsr->concerns)
+                                    <details class="bg-gray-100 px-4 py-2 rounded-md group">
+                                        <summary class="text-sm text-gray-700 mr-2 cursor-pointer flex justify-between items-center list-none ">
+                                           
+                                            <span>
+                                                Concerns
+                                            </span>
+
+                                            <span class="transition group-open:rotate-180">
+                                            <svg fill="none" 
+                                            height="24" 
+                                            shape-rendering="geometricPrecision" 
+                                            stroke="currentColor" 
+                                            stroke-linecap="round" 
+                                            stroke-linejoin="round" 
+                                            stroke-width="1.5" 
+                                            viewBox="0 0 24 24" 
+                                            width="24">
+                                            <path
+                                            d="M6 9l6 6 6-6">
+                                            </path>
+                                            
+                                            </svg>
+                                            </span>
+                                        </summary>
+
+                                            <div class="flex gap-1 group-open:opacity-100 ">
+                                                <span class="text-sm font-light text-gray-900 inline-block px-4 py-2 rounded-md">
+                                                    {{ $fsr->concerns ?? 'NA' }}
                                                 </span>
-                                            @endforeach
-                                        @else
-                                            <span class="text-lg font-semibold text-gray-900 inline-block">NA</span>
-                                        @endif
-                                    </div>
+                                            </div>
+                                        </details>
+                                    @else
+                                        <span class="text-lg font-semibold text-gray-900 inline-block"></span>
+                                    @endif
+
                                 </div>
+
+                                <div class="flex flex-col">
+                                    @if ($fsr->service_rendered)
+                                    <details class="bg-gray-100 px-4 py-2 rounded-md group">
+                                        <summary class="text-sm text-gray-700 mr-2 cursor-pointer flex justify-between items-center list-none ">
+                                           
+                                            <span>
+                                                Service Rendered
+                                            </span>
+
+                                            <span class="transition group-open:rotate-180 open:rotate-180">
+                                            <svg fill="none" 
+                                            height="24" 
+                                            shape-rendering="geometricPrecision" 
+                                            stroke="currentColor" 
+                                            stroke-linecap="round" 
+                                            stroke-linejoin="round" 
+                                            stroke-width="1.5" 
+                                            viewBox="0 0 24 24" 
+                                            width="24">
+                                            <path
+                                            d="M6 9l6 6 6-6">
+                                            </path>
+                                            
+                                            </svg>
+                                            </span>
+                                        </summary>
+
+                                            <div class="flex gap-1 ">
+                                                <span class="text-sm font-light text-gray-900 inline-block  px-4 py-2 rounded-md">
+                                                    {{ $fsr->service_rendered ?? 'NA' }}
+                                                </span>
+                                            </div>
+                                        </details>
+                                    @else
+                                        <span class="text-lg font-semibold text-gray-900 inline-block"></span>
+                                    @endif
+
+                                </div>
+
+                                <div class="flex flex-col">
+                                    @if ($fsr->recommendation)
+                                    <details class="bg-gray-100 px-4 py-2 rounded-md group">
+                                        <summary class="text-sm text-gray-700 mr-2 cursor-pointer flex justify-between items-center list-none ">
+                                           
+                                            <span>
+                                                Recommendation
+                                            </span>
+
+                                            <span class="transition group-open:rotate-180 open:rotate-180">
+                                            <svg fill="none" 
+                                            height="24" 
+                                            shape-rendering="geometricPrecision" 
+                                            stroke="currentColor" 
+                                            stroke-linecap="round" 
+                                            stroke-linejoin="round" 
+                                            stroke-width="1.5" 
+                                            viewBox="0 0 24 24" 
+                                            width="24">
+                                            <path
+                                            d="M6 9l6 6 6-6">
+                                            </path>
+                                            
+                                            </svg>
+                                            </span>
+                                        </summary>
+
+                                            <div class="flex gap-1 ">
+                                                <span class="text-sm font-light text-gray-900 inline-block  px-4 py-2 rounded-md">
+                                                    {{ $fsr->recommendation ?? 'NA' }}
+                                                </span>
+                                            </div>
+                                        </details>
+                                    @else
+                                        <span class="text-lg font-semibold text-gray-900 inline-block"></span>
+                                    @endif
+
+                                </div>
+
+
+
                             </div>
 
 

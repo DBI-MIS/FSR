@@ -65,8 +65,8 @@ protected static ?string $navigationGroup = 'FSR';
             ->defaultPaginationPageOption(25)
             ->deferLoading()
             ->columns([
-                // TextColumn::make('id')->sortable()
-                // ->default('No Data'),
+                TextColumn::make('id')->sortable()
+                ->default('No Data'),
                 TextColumn::make('name')->searchable()
                 ->default('No Data'),
                 TextColumn::make('address')
@@ -74,8 +74,8 @@ protected static ?string $navigationGroup = 'FSR';
                 
                 TextColumn::make('warranty')
                 ->default('No Data')
-            ->badge()
-            ->color(fn (string $state): string => match ($state) {
+                ->badge()
+                ->color(fn (string $state): string => match ($state) {
                 'Under Warranty' => 'success',
                 'Out of Warranty' => 'warning',
                 'In House' => 'info',
