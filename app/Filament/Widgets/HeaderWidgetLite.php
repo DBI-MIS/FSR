@@ -37,6 +37,7 @@ class HeaderWidgetLite extends Widget
             'Repair/Modification' => Fsr::whereJsonContains('attended_to', 'Repair/Modification')->count(),
             'Hauling' => Fsr::whereJsonContains('attended_to', 'Hauling')->count(),
             'Delivery' => Fsr::whereJsonContains('attended_to', 'Delivery')->count(),
+            'Retrofitting' => Fsr::whereJsonContains('attended_to', 'Retrofitting')->count(),
             'Others' => Fsr::whereJsonContains('attended_to', 'Others')->count(),
         ];
 

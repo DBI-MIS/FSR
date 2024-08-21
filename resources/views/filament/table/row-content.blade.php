@@ -8,10 +8,11 @@
             Date:
         </span>
         <span class="text-sm font-bold">
-            {{ $getRecord()
-            ->job_date_started
-            ->format('M d, Y')
-             ?? 'NA'}}
+            @if ($getRecord()->job_date_started)
+            {{ \Carbon\Carbon::parse($getRecord()->job_date_started)->format('M d, Y') }}
+            @else
+            N/A
+        @endif
         </span>
     </p>
     </div>

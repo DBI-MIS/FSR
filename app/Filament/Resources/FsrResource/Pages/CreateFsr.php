@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\FsrResource\Pages;
 
 use App\Filament\Resources\FsrResource;
+use Carbon\Carbon;
 use Filament\Actions;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Fieldset;
@@ -77,16 +78,28 @@ class CreateFsr extends CreateRecord
 
                             DatePicker::make('job_date_started')
                                 ->label('Date Started')
-                                ->nullable(),
+                                ->date()
+                                ->nullable()
+                                // ->timezone('Asia/Manila')
+                                ->default(Carbon::today()),
                             TimePicker::make('time_arrived')
                                 ->label('Time Arrived')
-                                ->nullable(),
+                                ->time()
+                                ->nullable()
+                                // ->timezone('Asia/Manila')
+                                ->default(Carbon::now()),
                             DatePicker::make('job_date_finished')
                                 ->label('Date Finished')
-                                ->nullable(),
+                                ->date()
+                                ->nullable()
+                                // ->timezone('Asia/Manila')
+                                ->default(Carbon::today()),
                             TimePicker::make('time_completed')
                                 ->label('Time Completed')
-                                ->nullable(),
+                                ->time()
+                                ->nullable()
+                                // ->timezone('Asia/Manila')
+                                ->default(Carbon::now()),
                             
                             
 
@@ -106,6 +119,7 @@ class CreateFsr extends CreateRecord
                                     'Repair/Modification' => 'Repair/Modification',
                                     'Hauling' => 'Hauling',
                                     'Delivery' => 'Delivery',
+                                    'Retrofitting' => 'Retrofitting',
                                     'Others' => 'Others',
                                 ])
                                 ->multiple()

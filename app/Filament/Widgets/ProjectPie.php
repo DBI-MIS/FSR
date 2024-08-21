@@ -38,35 +38,43 @@ protected static ?array $options = [
     ],
 ];
 
-    protected function getData(): array
-    {
-        
-        $projects = Project::withCount('fsrs')
-            ->get()
-            ->filter(function ($project) {
-                return $project->fsrs_count > 0;
-            });
+protected function getData(): array
+{
+    // Fetch projects with FSR counts
+    $projects = Project::withCount('fsrs')
+        ->orderBy('fsrs_count', 'desc') // Sort projects by FSR count
+        ->get();
 
-        $labels = $projects->pluck('name')->toArray();
+    // Split the projects into top 10 and the rest
+    $topProjects = $projects->take(10);
+    $otherProjects = $projects->slice(10);
 
-        $data = $projects->pluck('fsrs_count')->toArray();
+    // Labels and data for top 10 projects
+    $labels = $topProjects->pluck('name')->toArray();
+    $data = $topProjects->pluck('fsrs_count')->toArray();
 
-        return [
-            'datasets' => [
-                [
-                    'label' => 'FSRs Count',
-                    'data' => $data,
-                    'backgroundColor' => array_map(function () {
-                        $red = mt_rand(0, 100);
-                        $green = mt_rand(0, 100);
-                        $blue = mt_rand(155, 255);
-                        return sprintf('#%02X%02X%02X', $red, $green, $blue);
-                    }, $data),
-                ],
-            ],
-            'labels' => $labels,
-        ];
+    // Aggregate data for "Others"
+    if ($otherProjects->isNotEmpty()) {
+        $labels[] = 'Others';
+        $data[] = $otherProjects->sum('fsrs_count');
     }
+
+    return [
+        'datasets' => [
+            [
+                'label' => 'FSRs Count',
+                'data' => $data,
+                'backgroundColor' => array_map(function () {
+                    $red = mt_rand(0, 100);
+                    $green = mt_rand(0, 100);
+                    $blue = mt_rand(155, 255);
+                    return sprintf('#%02X%02X%02X', $red, $green, $blue);
+                }, $data),
+            ],
+        ],
+        'labels' => $labels,
+    ];
+}
 
     protected function getType(): string
     {

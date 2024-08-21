@@ -1,12 +1,16 @@
 <div class="mx-20">
-   
+
 
     <div class="max-w-[90%] p-12 bg-white rounded-lg shadow-lg shadow-black/20 mx-auto mb-20">
+
+
+
         @php
-        $sortedFsrs = $getRecord()->fsrs->sortByDesc(function ($fsr) {
-            return $fsr->job_date_started;
-        });
-    @endphp
+            $sortedFsrs = $getRecord()->fsrs->sortByDesc(function ($fsr) {
+                return $fsr->job_date_started;
+            });
+        @endphp
+
         <div class="grid grid-cols-1 md:grid-cols-5 gap-20">
             <!-- Title and Description Section -->
             <div class="col-span-2">
@@ -38,48 +42,97 @@
                             {{ $warrantyStatus }}
                         </span>
                     </p>
+
+                    <!-- Search Bar -->
+                    <div class="mb-5 pt-5">
+                        <input type="text" id="search" placeholder="Search by FSR No."
+                               class="w-full p-3 border border-gray-300 rounded-md" oninput="filterFsrs()">
+                    </div>
+
+
                     <div>
                         @php
-                            $latestFsrsByYear = $sortedFsrs
+                            use Carbon\Carbon;
+
+                            $latestFsrsByQuarter = $sortedFsrs
                                 ->groupBy(function ($fsr) {
-                                    return $fsr->job_date_started->format('Y');
+                                    $date = $fsr->job_date_started ? Carbon::parse($fsr->job_date_started) : null;
+                                    if ($date) {
+                                        $year = $date->format('Y');
+                                        $quarter = ceil($date->month / 3);
+                                        return ' Q' . $quarter . $year;
+                                    }
+                                    return 'Unknown';
                                 })
                                 ->map(function ($fsrs) {
-                                    return $fsrs->sortByDesc('job_date_started')->first();
+                                    return $fsrs
+                                        ->sortByDesc(function ($fsr) {
+                                            $date = $fsr->job_date_started
+                                                ? Carbon::parse($fsr->job_date_started)
+                                                : null;
+                                            return $date ?: now();
+                                        })
+                                        ->first();
                                 });
                         @endphp
-                   @if ($latestFsrsByYear)
-                   
-                   <ul>
-                       @foreach ($latestFsrsByYear as $year => $fsr)
-                           @if ($fsr->id && $fsr->job_date_started)
-                           <span class="text-sm text-gray-700 w-full block">Go to:</span>
-                               <li class="inline-flex items-center gap-1">
-                                   <div class="w-3">
-                                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" id="Text-Flow-Rows--Streamline-Sharp"><desc>Text Flow Rows Streamline Icon: https://streamlinehq.com</desc><g id="text-flow-rows"><path id="Union" fill="#8fbffa" fill-rule="evenodd" d="M19.3842 2.9749H4.0688V5.1628H16.7434L3.2954 18.6108L1.428 20.4781H18.2902V23.76H19.3842L23.76 19.3842L19.3842 15.0084H18.2902V18.2902H6.7096L20.1576 4.8423L22.025 2.9749H19.3842Z" clip-rule="evenodd" stroke-width="1"></path><path id="Union_2" fill="#2859c5" fill-rule="evenodd" d="M0.24 0.24H7.8977V7.8977H0.24V0.24ZM0.24 15.5553H7.8977V23.213H0.24V15.5553ZM23.213 0.24H15.5553V7.8977H23.213V0.24Z" clip-rule="evenodd" stroke-width="1"></path></g></svg>
-                                   </div>
-                                   <a href="#fsr-{{ $fsr->id }}" class="text-gray-600 font-bold hover:text-blue-600">
-                                       {{ $fsr->job_date_started->format('Y') }}
-                                   </a>
-                               </li>
-                           @endif
-                       @endforeach
-                   </ul>
-               @endif
+                        @if ($latestFsrsByQuarter)
+
+
+                            <div class="flex flex-row items-center gap-1">
+                                <div class="w-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        id="Text-Flow-Rows--Streamline-Sharp">
+                                        <desc>Text Flow Rows Streamline Icon: https://streamlinehq.com
+                                        </desc>
+                                        <g id="text-flow-rows">
+                                            <path id="Union" fill="#8fbffa" fill-rule="evenodd"
+                                                d="M19.3842 2.9749H4.0688V5.1628H16.7434L3.2954 18.6108L1.428 20.4781H18.2902V23.76H19.3842L23.76 19.3842L19.3842 15.0084H18.2902V18.2902H6.7096L20.1576 4.8423L22.025 2.9749H19.3842Z"
+                                                clip-rule="evenodd" stroke-width="1"></path>
+                                            <path id="Union_2" fill="#2859c5" fill-rule="evenodd"
+                                                d="M0.24 0.24H7.8977V7.8977H0.24V0.24ZM0.24 15.5553H7.8977V23.213H0.24V15.5553ZM23.213 0.24H15.5553V7.8977H23.213V0.24Z"
+                                                clip-rule="evenodd" stroke-width="1"></path>
+                                        </g>
+                                    </svg>
+                                </div>
+
+                                <span class="text-sm text-gray-700 w-full block">Go to:</span>
+                            </div>
+                            <ul>
+                                @foreach ($latestFsrsByQuarter as $period => $fsr)
+                                    @if ($fsr->id && $fsr->job_date_started)
+                                        <li class="block items-center gap-1">
+
+                                            <a href="#fsr-{{ $fsr->id }}"
+                                                class="text-gray-600 font-bold hover:text-blue-600">
+                                                @if ($fsr->job_date_started)
+                                                    {{ ' Q' . ceil(\Carbon\Carbon::parse($fsr->job_date_started)->month / 3) . ' - ' . \Carbon\Carbon::parse($fsr->job_date_started)->format('Y') }}
+                                                @else
+                                                    N/A
+                                                @endif
+                                            </a>
+                                        </li>
+                                    @endif
+                                @endforeach
+                            </ul>
+                        @endif
+
+
                     </div>
+
                 </div>
+
             </div>
 
             <!-- Timeline Section -->
             <div class="col-span-3 min-h-[500px]">
                 <h1 class="text-2xl font-bold mb-10">Timeline View</h1>
-                <ul class="relative border-l-4 border-sky-600">
+                <ul class="relative border-l-4 border-sky-600" id="fsr-list">
 
 
 
                     @forelse ($sortedFsrs as $fsr)
 
-                        <li id="fsr-{{ $fsr->id }}" class="mb-10 ml-6">
+                        <li id="fsr-{{ $fsr->id }}" class="mb-10 ml-6 fsr-item">
                             <span
                                 class="absolute flex items-center justify-center w-6 h-6 bg-sky-600 rounded-full -left-3.5 ring-8 ring-white dark:ring-gray-900">
                                 <svg aria-hidden="true" class="w-3 h-3 text-white" fill="currentColor"
@@ -92,47 +145,52 @@
                             <div class="flex flex-col gap-2">
 
                                 <div class="flex flex-row justify-between items-center">
-                                <div class="flex flex-row items-center gap-2">
-                                    <span class="text-sm text-gray-700">FSR No.:</span>
-                                    <span class="text-xl text-gray-700 font-semibold">{{ $fsr->fsr_no }}</span>
-                                </div>
+                                    <div class="flex flex-row items-center gap-2">
+                                        <span class="text-sm text-gray-700">FSR No.:</span>
+                                        <div class="fsr-no text-xl text-gray-700 font-semibold" data-fsr-no="{{ $fsr->fsr_no }}">
+                                            <a href="{{ route('filament.admin.resources.fsrs.view', ['record' => $fsr->id]) }}" wire:navigate>
+                                                <span class="fsr-no-text">{{ $fsr->fsr_no }}</span>
+                                        </a>
+                                    </div>
+                                    </div>
 
-                                <div class="block text-lg font-normal leading-none text-slate-500">
-                                    {{ $fsr->job_date_started->format('l - M d, Y') ?? '-' }}</div>
-                                
+                                    <div class="block text-lg font-normal leading-none text-slate-500">
+                                        @if ($fsr->job_date_started)
+                                            {{ \Carbon\Carbon::parse($fsr->job_date_started)->format('l - M d, Y') }}
+                                        @else
+                                            N/A
+                                        @endif
+                                    </div>
+
                                 </div>
                                 <hr>
 
                                 <div class="flex flex-col">
-                                    
+
                                     <details open class="bg-gray-100 px-4 py-2 rounded-md group ">
-                                        <summary class="text-sm text-gray-700 mr-2 cursor-pointer flex justify-between items-center list-none ">
-                                           
+                                        <summary
+                                            class="text-sm text-gray-700 mr-2 cursor-pointer flex justify-between items-center list-none ">
+
                                             <span>
                                                 Attended To
                                             </span>
 
-                                            <span class="transition-transform duration-300 ease-in-out group-open:rotate-180">
-                                            <svg fill="none" 
-                                            height="24" 
-                                            shape-rendering="geometricPrecision" 
-                                            stroke="currentColor" 
-                                            stroke-linecap="round" 
-                                            stroke-linejoin="round" 
-                                            stroke-width="1.5" 
-                                            viewBox="0 0 24 24" 
-                                            width="24">
-                                            <path
-                                            d="M6 9l6 6 6-6">
-                                            </path>
-                                            
-                                            </svg>
+                                            <span
+                                                class="transition-transform duration-300 ease-in-out group-open:rotate-180">
+                                                <svg fill="none" height="24" shape-rendering="geometricPrecision"
+                                                    stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                                    stroke-width="1.5" viewBox="0 0 24 24" width="24">
+                                                    <path d="M6 9l6 6 6-6">
+                                                    </path>
+
+                                                </svg>
                                             </span>
                                         </summary>
                                         <div class="flex flex-wrap flex-row gap-1 mt-2">
                                             @if (is_array($fsr->attended_to))
                                                 @foreach ($fsr->attended_to as $action)
-                                                    <span class="text-sm font-semibold text-center text-white inline-block bg-blue-600 rounded-md px-6 py-1 tracking-wide text-nowrap {{ $loop->last ? 'flex-none' : 'flex-1' }} ">
+                                                    <span
+                                                        class="text-sm font-semibold text-center text-white inline-block bg-blue-600 rounded-md px-6 py-1 tracking-wide text-nowrap {{ $loop->last ? 'flex-none' : 'flex-1' }} ">
                                                         {{ $action ?? 'NA' }}
                                                     </span>
                                                     {{-- @if (!$loop->last)
@@ -143,38 +201,34 @@
                                             @endif
                                         </div>
                                     </details>
-                            
+
                                 </div>
 
                                 <div class="flex flex-col">
                                     @if ($fsr->concerns)
-                                    <details class="bg-gray-100 px-4 py-2 rounded-md group">
-                                        <summary class="text-sm text-gray-700 mr-2 cursor-pointer flex justify-between items-center list-none ">
-                                           
-                                            <span>
-                                                Concerns
-                                            </span>
+                                        <details class="bg-gray-100 px-4 py-2 rounded-md group">
+                                            <summary
+                                                class="text-sm text-gray-700 mr-2 cursor-pointer flex justify-between items-center list-none ">
 
-                                            <span class="transition group-open:rotate-180">
-                                            <svg fill="none" 
-                                            height="24" 
-                                            shape-rendering="geometricPrecision" 
-                                            stroke="currentColor" 
-                                            stroke-linecap="round" 
-                                            stroke-linejoin="round" 
-                                            stroke-width="1.5" 
-                                            viewBox="0 0 24 24" 
-                                            width="24">
-                                            <path
-                                            d="M6 9l6 6 6-6">
-                                            </path>
-                                            
-                                            </svg>
-                                            </span>
-                                        </summary>
+                                                <span>
+                                                    Concerns
+                                                </span>
+
+                                                <span class="transition group-open:rotate-180">
+                                                    <svg fill="none" height="24"
+                                                        shape-rendering="geometricPrecision" stroke="currentColor"
+                                                        stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="1.5" viewBox="0 0 24 24" width="24">
+                                                        <path d="M6 9l6 6 6-6">
+                                                        </path>
+
+                                                    </svg>
+                                                </span>
+                                            </summary>
 
                                             <div class="flex gap-1 group-open:opacity-100 ">
-                                                <span class="text-sm font-light text-gray-900 inline-block px-4 py-2 rounded-md">
+                                                <span
+                                                    class="text-sm font-light text-gray-900 inline-block px-4 py-2 rounded-md">
                                                     {{ $fsr->concerns ?? 'NA' }}
                                                 </span>
                                             </div>
@@ -187,33 +241,29 @@
 
                                 <div class="flex flex-col">
                                     @if ($fsr->service_rendered)
-                                    <details class="bg-gray-100 px-4 py-2 rounded-md group">
-                                        <summary class="text-sm text-gray-700 mr-2 cursor-pointer flex justify-between items-center list-none ">
-                                           
-                                            <span>
-                                                Service Rendered
-                                            </span>
+                                        <details class="bg-gray-100 px-4 py-2 rounded-md group">
+                                            <summary
+                                                class="text-sm text-gray-700 mr-2 cursor-pointer flex justify-between items-center list-none ">
 
-                                            <span class="transition group-open:rotate-180 open:rotate-180">
-                                            <svg fill="none" 
-                                            height="24" 
-                                            shape-rendering="geometricPrecision" 
-                                            stroke="currentColor" 
-                                            stroke-linecap="round" 
-                                            stroke-linejoin="round" 
-                                            stroke-width="1.5" 
-                                            viewBox="0 0 24 24" 
-                                            width="24">
-                                            <path
-                                            d="M6 9l6 6 6-6">
-                                            </path>
-                                            
-                                            </svg>
-                                            </span>
-                                        </summary>
+                                                <span>
+                                                    Service Rendered
+                                                </span>
+
+                                                <span class="transition group-open:rotate-180 open:rotate-180">
+                                                    <svg fill="none" height="24"
+                                                        shape-rendering="geometricPrecision" stroke="currentColor"
+                                                        stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="1.5" viewBox="0 0 24 24" width="24">
+                                                        <path d="M6 9l6 6 6-6">
+                                                        </path>
+
+                                                    </svg>
+                                                </span>
+                                            </summary>
 
                                             <div class="flex gap-1 ">
-                                                <span class="text-sm font-light text-gray-900 inline-block  px-4 py-2 rounded-md">
+                                                <span
+                                                    class="text-sm font-light text-gray-900 inline-block  px-4 py-2 rounded-md">
                                                     {{ $fsr->service_rendered ?? 'NA' }}
                                                 </span>
                                             </div>
@@ -226,33 +276,29 @@
 
                                 <div class="flex flex-col">
                                     @if ($fsr->recommendation)
-                                    <details class="bg-gray-100 px-4 py-2 rounded-md group">
-                                        <summary class="text-sm text-gray-700 mr-2 cursor-pointer flex justify-between items-center list-none ">
-                                           
-                                            <span>
-                                                Recommendation
-                                            </span>
+                                        <details class="bg-gray-100 px-4 py-2 rounded-md group">
+                                            <summary
+                                                class="text-sm text-gray-700 mr-2 cursor-pointer flex justify-between items-center list-none ">
 
-                                            <span class="transition group-open:rotate-180 open:rotate-180">
-                                            <svg fill="none" 
-                                            height="24" 
-                                            shape-rendering="geometricPrecision" 
-                                            stroke="currentColor" 
-                                            stroke-linecap="round" 
-                                            stroke-linejoin="round" 
-                                            stroke-width="1.5" 
-                                            viewBox="0 0 24 24" 
-                                            width="24">
-                                            <path
-                                            d="M6 9l6 6 6-6">
-                                            </path>
-                                            
-                                            </svg>
-                                            </span>
-                                        </summary>
+                                                <span>
+                                                    Recommendation
+                                                </span>
+
+                                                <span class="transition group-open:rotate-180 open:rotate-180">
+                                                    <svg fill="none" height="24"
+                                                        shape-rendering="geometricPrecision" stroke="currentColor"
+                                                        stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="1.5" viewBox="0 0 24 24" width="24">
+                                                        <path d="M6 9l6 6 6-6">
+                                                        </path>
+
+                                                    </svg>
+                                                </span>
+                                            </summary>
 
                                             <div class="flex gap-1 ">
-                                                <span class="text-sm font-light text-gray-900 inline-block  px-4 py-2 rounded-md">
+                                                <span
+                                                    class="text-sm font-light text-gray-900 inline-block  px-4 py-2 rounded-md">
                                                     {{ $fsr->recommendation ?? 'NA' }}
                                                 </span>
                                             </div>
@@ -271,14 +317,41 @@
 
 
                         </li>
-                        @empty
-                            <li class="ml-6 text-sm text-gray-500 dark:text-gray-400">No records found.</li>
-                        @endforelse
-                    </ul>
-                </div>
+                    @empty
+                        <li class="ml-6 text-sm text-gray-500 dark:text-gray-400">No records found.</li>
+                    @endforelse
+                </ul>
             </div>
         </div>
-
-
-
     </div>
+
+
+
+</div>
+
+<script>
+    function filterFsrs() {
+        let searchValue = document.getElementById('search').value.toLowerCase();
+        let fsrItems = document.querySelectorAll('.fsr-item');
+        let foundMatch = false;
+
+        fsrItems.forEach(fsr => {
+            let fsrNoElement = fsr.querySelector('.fsr-no-text');
+            let fsrNo = fsrNoElement.textContent.toLowerCase();
+
+            // Clear previous highlights
+            fsrNoElement.innerHTML = fsrNoElement.textContent;
+
+            if (fsrNo.includes(searchValue)) {
+                let regex = new RegExp(`(${searchValue})`, 'gi');
+                fsrNoElement.innerHTML = fsrNo.replace(regex, '<span class="bg-yellow-200">$1</span>');
+                
+                if (!foundMatch) {
+                    // Scroll to the match and center it in the view
+                    fsr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    foundMatch = true;
+                }
+            }
+        });
+    }
+</script>

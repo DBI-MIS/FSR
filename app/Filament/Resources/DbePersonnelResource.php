@@ -7,6 +7,7 @@ use App\Filament\Resources\DbePersonnelResource\RelationManagers;
 use App\Models\DbePersonnel;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
@@ -29,48 +30,64 @@ class DbePersonnelResource extends Resource
     protected static ?int $navigationSort = 4;
 
     public static function getNavigationBadge(): ?string
-{
-    return static::getModel()::count();
-}
+    {
+        return static::getModel()::count();
+    }
 
-protected static ?string $navigationGroup = 'FSR';
+    protected static ?string $navigationGroup = 'FSR';
 
-protected static ?string $label = 'DBE Personnel';
+    protected static ?string $label = 'DBE Personnel';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-              
-                TextInput::make('name')
-                    ->required(),
-                TextInput::make('designation')->nullable(),
-                ToggleButtons::make('employee_status')->inline()
-                ->options([
-                    'Active' => 'Active',
-                    'Inactive' => 'Inactive',
-                    'Resigned' => 'Resigned',
-                ])
-                ->colors([
-                    'Active' => 'success',
-                    'Inactive' => 'info',
-                    'Resigned' => 'warning',
-                ])
-                ->nullable(),
-                FileUpload::make('profile_photo_path')
-                ->image()
-                ->avatar()
-                ->imageEditor()
-                ->circleCropper()
-                ->getUploadedFileNameForStorageUsing(
-                    fn (TemporaryUploadedFile $file): string => (string) str($file->getClientOriginalName())
-                        ->prepend('profile-photo-'),
-                )
-                ->label('Profile Photo')
-                ->directory('profiles')
-                ->visibility('public')
-                ->nullable(),
-            ])->columns(3);
+                Section::make(' ')
+                    ->description(' ')
+                    ->schema([
+                        FileUpload::make('profile_photo_path')
+                            ->image()
+                            ->avatar()
+                            ->imageEditor()
+                            ->circleCropper()
+                            ->getUploadedFileNameForStorageUsing(
+                                fn(TemporaryUploadedFile $file): string => (string) str($file->getClientOriginalName())
+                                    ->prepend('profile-photo-'),
+                            )
+                            ->label('Photo')
+                            ->directory('profiles')
+                            ->visibility('public')
+                            ->nullable(),
+                       
+                    ])->columnSpan(1),
+
+
+
+                Section::make(' ')
+                    ->description(' ')
+                    ->schema([
+                        TextInput::make('name')
+                            ->required(),
+                        TextInput::make('designation')->nullable(),
+                        ToggleButtons::make('employee_status')->inline()
+                        ->options([
+                            'Active' => 'Active',
+                            'Inactive' => 'Inactive',
+                            'Resigned' => 'Resigned',
+                        ])
+                        ->colors([
+                            'Active' => 'success',
+                            'Inactive' => 'info',
+                            'Resigned' => 'warning',
+                        ])
+                        ->nullable(),
+
+
+                    ])->columnSpan(3),
+
+
+
+            ])->columns(4);
     }
 
     public static function table(Table $table): Table
@@ -81,23 +98,23 @@ protected static ?string $label = 'DBE Personnel';
             ->deferLoading()
             ->columns([
                 TextColumn::make('id')
-                ->searchable(),
+                    ->searchable(),
                 ImageColumn::make('profile_photo_path')
-                ->circular()
-                ->defaultImageUrl(url('profiles/profile-photo-default_profile.jpg'))
-                // ->ring(5)
-                ->size(40)
-                ->label(' ')
+                    ->circular()
+                    ->defaultImageUrl(url('user_profile.svg'))
+                    // ->ring(5)
+                    ->size(40)
+                    ->label(' ')
                 // ->checkFileExistence(false)
                 // ->visibility('public')
-                ,               
+                ,
                 TextColumn::make('name')
                     ->searchable(),
                 TextColumn::make('designation')
                     ->searchable()
                     ->default('No Data'),
                 TextColumn::make('employee_status')->badge()
-                ->label('Status')
+                    ->label('Status')
                     ->searchable()
                     ->default('No Data'),
                 TextColumn::make('created_at')

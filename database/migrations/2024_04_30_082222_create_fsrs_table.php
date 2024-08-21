@@ -29,8 +29,8 @@ return new class extends Migration
             $table->foreignIdFor(User::class);
             $table->time('time_arrived')->nullable();
             $table->time('time_completed')->nullable();
-            $table->date('job_date_started')->nullable();
-            $table->date('job_date_finished')->nullable();
+            $table->dateTime('job_date_started')->nullable();
+            $table->dateTime('job_date_finished')->nullable();
             $table->foreignIdFor(Project::class)->nullable();
             $table->longText('attended_to')->nullable();
             $table->longText('concerns')->nullable();

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\FsrResource\Widgets;
 
 use App\Filament\Resources\FsrResource;
 use App\Models\Fsr;
+use App\Models\Project;
 use Filament\Actions\Action;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\FontWeight;
@@ -49,11 +50,13 @@ class LatestFsr extends BaseWidget
             ])->defaultSort('created_at', 'desc')
                 ->actions([
                 Tables\Actions\ViewAction::make('view')
-                ->requiresConfirmation()
+                ->label('View Record')
                 ->url(fn (Fsr $record): string => route('filament.admin.resources.fsrs.view', $record)),
-                // ->openUrlInNewTab()
+                Tables\Actions\ViewAction::make('timeline')
+                ->label('Project History')
+                ->icon('heroicon-m-magnifying-glass-circle')
+                ->url(fn (Fsr $record): string => route('filament.admin.resources.projects.view', $record->project_id))
                 ])
-            
 
             ;
     }

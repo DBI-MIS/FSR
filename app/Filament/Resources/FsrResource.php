@@ -12,6 +12,7 @@ use App\Models\Equipment;
 use App\Models\Fsr;
 use App\Models\Project;
 use App\Models\Rating;
+use Carbon\Carbon;
 use Faker\Provider\ar_EG\Text;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
@@ -66,6 +67,8 @@ use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Filters\QueryBuilder\Constraints\NumberConstraint;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Support\Facades\Auth;
+use Parallax\FilamentComments\Infolists\Components\CommentsEntry;
+use Parallax\FilamentComments\Tables\Actions\CommentsAction;
 
 class FsrResource extends Resource
 {
@@ -90,6 +93,7 @@ class FsrResource extends Resource
 
     public static function form(Form $form): Form
     {
+
         return $form
             ->schema([
                 Wizard::make([
@@ -137,16 +141,24 @@ class FsrResource extends Resource
 
                             DatePicker::make('job_date_started')
                                 ->label('Date Started')
-                                ->nullable(),
+                                // ->timezone('Asia/Manila')
+                                ->date()
+                                ->default('Carbon::today()'),
                             TimePicker::make('time_arrived')
                                 ->label('Time Arrived')
-                                ->nullable(),
+                                // ->timezone('Asia/Manila')
+                                ->time()
+                                ->default(Carbon::now()),
                             DatePicker::make('job_date_finished')
                                 ->label('Date Finished')
-                                ->nullable(),
+                                // ->timezone('Asia/Manila')
+                                ->date()
+                                ->default(Carbon::today()),
                             TimePicker::make('time_completed')
                                 ->label('Time Completed')
-                                ->nullable(),
+                                // ->timezone('Asia/Manila')
+                                ->time()
+                                ->default(Carbon::now()),
 
 
 
@@ -166,6 +178,7 @@ class FsrResource extends Resource
                                     'Repair/Modification' => 'Repair/Modification',
                                     'Hauling' => 'Hauling',
                                     'Delivery' => 'Delivery',
+                                    'Retrofitting' => 'Retrofitting',
                                     'Others' => 'Others',
                                 ])
                                 ->multiple()
@@ -772,12 +785,19 @@ class FsrResource extends Resource
                     ->preload()
                     ->searchable(),
 
-            ], layout: FiltersLayout::AboveContentCollapsible)
+            ],
+            // layout: FiltersLayout::AboveContentCollapsible)
+            layout: FiltersLayout::AboveContent)
             ->filtersFormColumns(4)
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ViewAction::make(),
-                // Tables\Actions\ViewAction::make()->slideOver()->modalWidth(MaxWidth::SixExtraLarge),
+                CommentsAction::make(),
+                Tables\Actions\ViewAction::make('timeline')
+                ->label('Project History')
+                ->icon('heroicon-m-magnifying-glass-circle')
+                ->url(fn (Fsr $record): string => route('filament.admin.resources.projects.view', $record->project_id)),
+                
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -791,7 +811,8 @@ class FsrResource extends Resource
         return $infolist
             ->schema([
 
-                View::make('infolists.components.fsr-view')->columnSpanFull()
+                View::make('infolists.components.fsr-view')->columnSpanFull(),
+                CommentsEntry::make('fsr_comments'),
             ]);
     }
 

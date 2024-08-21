@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
+use Illuminate\Support\Str;
 
 class DbePersonnel extends Model implements Sortable
 {
@@ -21,6 +22,15 @@ class DbePersonnel extends Model implements Sortable
         'status',
         'profile_photo_path'
     ];
+
+    public function getProfile() 
+{
+    $firstLetter = Str::limit(strip_tags($this->name), 1, ''); 
+    $wordsAfterPeriod = Str::after($this->name, '.'); 
+
+    return $firstLetter . '.' . $wordsAfterPeriod; 
+}
+
 
     public function fsr()
     {

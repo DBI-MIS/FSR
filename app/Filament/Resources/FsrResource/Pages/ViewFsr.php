@@ -8,12 +8,20 @@ use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\View\View;
 use Spatie\LaravelPdf\Facades\Pdf;
+use Parallax\FilamentComments\Actions\CommentsAction;
 
 class ViewFsr extends ViewRecord
 {
     protected static string $resource = FsrResource::class;
 
     protected static ?string $title = 'FSR';
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            CommentsAction::make(),
+        ];
+    }
 
     public function getHeader(): ?View
 {

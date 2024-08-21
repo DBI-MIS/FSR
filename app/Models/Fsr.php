@@ -15,10 +15,10 @@ class Fsr extends Model
     use HasFilamentComments;
 
     protected $casts = [
-        'time_arrived' => 'datetime:Y-m-d H:m:s', 
-        'time_completed' => 'datetime:Y-m-d H:m:s',
-        'job_date_started' => 'datetime:Y-m-d H:m:s', 
-        'job_date_finished' => 'datetime:Y-m-d H:m:s',
+        // 'time_arrived' => 'datetime:yyyy-mm-dd hh:mm:ss', 
+        // 'time_completed' => 'datetime:yyyy-mm-dd hh:mm:ss',
+        // 'job_date_started' => 'date:yyyy-mm-dd', 
+        // 'job_date_finished' => 'date:yyyy-mm-dd',
         'attended_to' => 'array',
     ];
 
