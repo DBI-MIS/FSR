@@ -18,6 +18,7 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Contracts\Database\Query\Builder;
 use Filament\Tables\Columns\Layout\View;
+use Filament\Tables\Enums\ActionsPosition;
 
 class LatestFsr extends BaseWidget
 {
@@ -50,10 +51,10 @@ class LatestFsr extends BaseWidget
             ])->defaultSort('created_at', 'desc')
                 ->actions([
                 Tables\Actions\ViewAction::make('view')
-                ->label('View Record')
+                ->label('View')
                 ->url(fn (Fsr $record): string => route('filament.admin.resources.fsrs.view', $record)),
                 Tables\Actions\ViewAction::make('timeline')
-                ->label('Project History')
+                ->label('Timeline')
                 ->icon('heroicon-m-magnifying-glass-circle')
                 ->url(fn (Fsr $record): string => route('filament.admin.resources.projects.view', $record->project_id))
                 ])

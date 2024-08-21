@@ -61,6 +61,13 @@ protected static ?string $label = 'Equipments';
             ->deferLoading()
             ->striped()
             ->columns([
+                TextColumn::make('fsrs.fsr_no')
+                    ->label('FSR')
+                    ->default('No FSR Associated')
+                    ->listWithLineBreaks()
+                    ->limitList(3)
+                    ->expandableLimitedList()
+                    ->badge(),
                 TextColumn::make('brand')
                     ->searchable()
                     ->default('No Data'),

@@ -21,6 +21,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Infolists\Infolist;
+use Parallax\FilamentComments\Infolists\Components\CommentsEntry;
+
 class ProjectResource extends Resource
 {
     protected static ?string $model = Project::class;
@@ -105,9 +107,10 @@ protected static ?string $navigationGroup = 'FSR';
         return $infolist
             ->schema([
                 View::make('filament.part.project-view')
-                ->columnSpanFull()
-                
-            ]);
+                ->columnSpan(3),
+                CommentsEntry::make('project_comments')
+                ->columnSpan(1),
+            ])->columns(4);
 
     }
 

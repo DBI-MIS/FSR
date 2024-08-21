@@ -26,10 +26,10 @@ class FsrEquipReplaceResource extends Resource
     protected static ?int $navigationSort = 5;
 
     public static function getNavigationBadge(): ?string
-{
-    return static::getModel()::count();
-}
-    
+    {
+        return static::getModel()::count();
+    }
+
     protected static ?string $navigationGroup = 'Equipments';
 
     protected static ?string $label = 'Replacement';
@@ -61,6 +61,13 @@ class FsrEquipReplaceResource extends Resource
             ->defaultPaginationPageOption(25)
             ->deferLoading()
             ->columns([
+                TextColumn::make('fsrs.fsr_no')
+                    ->label('FSR')
+                    ->default('No FSR Associated')
+                    ->listWithLineBreaks()
+                    ->limitList(3)
+                    ->expandableLimitedList()
+                    ->badge(),
                 TextColumn::make('brand')
                     ->searchable()
                     ->default('No Data'),

@@ -16,12 +16,6 @@ class ViewFsr extends ViewRecord
 
     protected static ?string $title = 'FSR';
 
-    protected function getHeaderActions(): array
-    {
-        return [
-            CommentsAction::make(),
-        ];
-    }
 
     public function getHeader(): ?View
 {
@@ -36,7 +30,6 @@ class ViewFsr extends ViewRecord
         'currentDate' => $currentDate,
         'currentTime' => $currentTime,
         'backUrl' => $this->getResource()::getUrl('index'),
-        // 'downloadPdfUrl' => route('fsr.downloadPdf', $this->record->id),
         
     ]);
 }

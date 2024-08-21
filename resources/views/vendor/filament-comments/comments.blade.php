@@ -1,4 +1,5 @@
-<div class="flex flex-col h-full space-y-4">
+<div class="flex flex-col space-y-4 sticky" style="max-height: 500px; top:100px">
+
     @if (auth()->user()->can('create', \Parallax\FilamentComments\Models\FilamentComment::class))
         <div class="space-y-4">
             {{ $this->form }}
@@ -13,10 +14,11 @@
     @endif
 
     @if (count($comments))
-        <x-filament::grid class="gap-4">
+        <x-filament::grid class="gap-4 overflow-auto">
             @foreach ($comments as $comment)
                 <div class="fi-in-repeatable-item block rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5 dark:bg-white/5 dark:ring-white/10">
                     <div class="flex gap-x-3">
+                        
                         @if (config('filament-comments.display_avatars'))
                             <x-filament-panels::avatar.user size="md" :user="$comment->user" />
                         @endif
@@ -57,6 +59,12 @@
                 </div>
             @endforeach
         </x-filament::grid>
+        @if ($comments->count() > 3)
+        <div class="text-center">
+            <span class="text-xs font-light cursor-none">Scroll to see more</span>
+        </div>
+    @endif
+        
     @else
         <div class="flex-grow flex flex-col items-center justify-center space-y-4">
             <x-filament::icon

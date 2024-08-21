@@ -10,14 +10,15 @@ use App\Filament\Resources\FsrResource\RelationManagers\ReplacementsRelationMana
 use App\Models\DbePersonnel;
 use App\Models\Equipment;
 use App\Models\Fsr;
+use App\Models\FsrEquipReplace;
 use App\Models\Project;
 use App\Models\Rating;
 use Carbon\Carbon;
-use Faker\Provider\ar_EG\Text;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -60,13 +61,18 @@ use Filament\Infolists\Components\View;
 use Filament\Infolists\Infolist;
 use Filament\Notifications\Collection;
 use Filament\Resources\RelationManagers\RelationGroup;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\Layout\View as LayoutView;
+use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Filters\QueryBuilder\Constraints\NumberConstraint;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Parallax\FilamentComments\Infolists\Components\CommentsEntry;
 use Parallax\FilamentComments\Tables\Actions\CommentsAction;
 
@@ -137,7 +143,51 @@ class FsrResource extends Resource
                                 ->nullable()
                                 ->relationship('personnels', 'name')
                                 ->searchable()
-                                ->preload(),
+                                ->preload()
+                                ->createOptionForm([
+                                    Section::make(' ')
+                                    ->description(' ')
+                                    ->schema([
+                                        FileUpload::make('profile_photo_path')
+                                            ->image()
+                                            ->avatar()
+                                            ->imageEditor()
+                                            ->circleCropper()
+                                            ->getUploadedFileNameForStorageUsing(
+                                                fn(TemporaryUploadedFile $file): string => (string) str($file->getClientOriginalName())
+                                                    ->prepend('profile-photo-'),
+                                            )
+                                            ->label('Photo')
+                                            ->directory('profiles')
+                                            ->visibility('public')
+                                            ->nullable(),
+                                       
+                                    ])->columnSpan(1),
+                
+                
+                
+                                Section::make(' ')
+                                    ->description(' ')
+                                    ->schema([
+                                        TextInput::make('name')
+                                            ->required(),
+                                        TextInput::make('designation')->nullable(),
+                                        ToggleButtons::make('employee_status')->inline()
+                                        ->options([
+                                            'Active' => 'Active',
+                                            'Inactive' => 'Inactive',
+                                            'Resigned' => 'Resigned',
+                                        ])
+                                        ->colors([
+                                            'Active' => 'success',
+                                            'Inactive' => 'info',
+                                            'Resigned' => 'warning',
+                                        ])
+                                        ->nullable(),
+                
+                
+                                    ])->columnSpan(3),
+                                ])->createOptionModalHeading('Create New Project'),
 
                             DatePicker::make('job_date_started')
                                 ->label('Date Started')
@@ -216,6 +266,8 @@ class FsrResource extends Resource
                                 ->relationship('equipments', 'model')
                                 ->searchable()
                                 ->nullable()
+                                ->getOptionLabelFromRecordUsing(fn (Equipment $record) => "{$record->brand} - {$record->model} | Serial No.:{$record->serial}")
+                                ->searchable(['brand', 'model', 'serial'])
                                 ->createOptionForm([
                                     TextInput::make('brand')
                                         ->nullable(),
@@ -228,6 +280,7 @@ class FsrResource extends Resource
                                         ->nullable()
                                         ->rows(3),
                                 ])->createOptionModalHeading('Create New Equipment'),
+                                
                             Fieldset::make('Voltage')
                                 ->columns(3)
                                 ->schema([
@@ -552,6 +605,8 @@ class FsrResource extends Resource
                                 ->nullable()
                                 ->searchable()
                                 ->columnSpan(4)
+                                ->getOptionLabelFromRecordUsing(fn (FsrEquipReplace $record) => "{$record->brand} - {$record->model} | Part No.:{$record->part_no}")
+                                ->searchable(['brand', 'model', 'part_no'])
                                 ->preload()
                                 ->createOptionForm([
                                     TextInput::make('part_quantity')
@@ -741,30 +796,6 @@ class FsrResource extends Resource
                         return $query;
                     }),
 
-
-                // Filter::make('job_date_started')
-                // ->form([
-                //     DatePicker::make('created_from'),
-                //     DatePicker::make('created_until'),
-                // ])
-                // ->query(function (Builder $query, array $data): Builder {
-                //     return $query
-                //         ->when(
-                //             $data['created_from'],
-                //             fn (Builder $query, $date): Builder => $query->whereDate('job_date_started', '>=', $date),
-                //         )
-                //         ->when(
-                //             $data['created_until'],
-                //             fn (Builder $query, $date): Builder => $query->whereDate('job_date_started', '<=', $date),
-                //         );
-                // })
-                // ->query(function (Builder $query, array $data): Builder {
-                //     if (!empty($data['job_date_started'])) {
-                //         $date = $data['job_date_started'];
-                //         return $query->whereDate('job_date_started', $date);
-                //     }
-                //     return $query;
-                // }),
                 Filter::make('attended_to')
                     ->form([
                         TextInput::make('attended_to')->label('FSR Type')
@@ -790,15 +821,17 @@ class FsrResource extends Resource
             layout: FiltersLayout::AboveContent)
             ->filtersFormColumns(4)
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\ViewAction::make(),
-                CommentsAction::make(),
-                Tables\Actions\ViewAction::make('timeline')
-                ->label('Project History')
+                
+                EditAction::make(),
+                ViewAction::make(),
+                ViewAction::make('timeline')
+                ->label('Timeline')
                 ->icon('heroicon-m-magnifying-glass-circle')
                 ->url(fn (Fsr $record): string => route('filament.admin.resources.projects.view', $record->project_id)),
-                
+                CommentsAction::make(),
+            
             ])
+            
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
@@ -812,7 +845,7 @@ class FsrResource extends Resource
             ->schema([
 
                 View::make('infolists.components.fsr-view')->columnSpanFull(),
-                CommentsEntry::make('fsr_comments'),
+                CommentsEntry::make('fsr_comments')->columnSpanFull(),
             ]);
     }
 

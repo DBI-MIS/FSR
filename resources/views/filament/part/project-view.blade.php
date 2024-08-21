@@ -1,7 +1,7 @@
-<div class="mx-20">
+<div class="w-full">
 
 
-    <div class="max-w-[90%] p-12 bg-white rounded-lg shadow-lg shadow-black/20 mx-auto mb-20">
+    <div class="max-w-[90%] py-4 px-6 bg-white rounded-lg shadow-lg shadow-black/20 mx-auto mb-20 min-h-screen">
 
 
 
@@ -11,12 +11,12 @@
             });
         @endphp
 
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-20">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-10">
             <!-- Title and Description Section -->
             <div class="col-span-2">
-                <div class="fixed z-20 p-4 min-h-min" style="max-width: 300px">
+                <div class="fixed min-h-min" style="max-width: 260px">
                     <span class="text-sm text-gray-700">Project/Client:</span>
-                    <h2 class="text-4xl font-bold mb-5 text-gray-900 dark:text-white">{{ $getRecord()->name ?? '-' }}
+                    <h2 class="text-3xl font-bold mb-5 text-gray-900 dark:text-white">{{ $getRecord()->name ?? '-' }}
                     </h2>
 
                     <span class="text-sm text-gray-700">Address:</span>
@@ -44,9 +44,9 @@
                     </p>
 
                     <!-- Search Bar -->
-                    <div class="mb-5 pt-5">
+                    <div class="mb-5 pt-2">
                         <input type="text" id="search" placeholder="Search by FSR No."
-                               class="w-full p-3 border border-gray-300 rounded-md" oninput="filterFsrs()">
+                               class="w-[80%] p-3 border border-gray-300 rounded-md" oninput="filterFsrs()">
                     </div>
 
 
@@ -78,7 +78,7 @@
                         @if ($latestFsrsByQuarter)
 
 
-                            <div class="flex flex-row items-center gap-1">
+                            <div class="md:flex flex-row items-center gap-1 hidden">
                                 <div class="w-3">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         id="Text-Flow-Rows--Streamline-Sharp">
@@ -97,6 +97,7 @@
 
                                 <span class="text-sm text-gray-700 w-full block">Go to:</span>
                             </div>
+                            <div class="min-h-[300px] overflow-y-scroll hidden md:block">
                             <ul>
                                 @foreach ($latestFsrsByQuarter as $period => $fsr)
                                     @if ($fsr->id && $fsr->job_date_started)
@@ -114,6 +115,7 @@
                                     @endif
                                 @endforeach
                             </ul>
+                        </div>
                         @endif
 
 
