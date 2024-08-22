@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\EquipmentResource\Pages;
 use App\Filament\Resources\EquipmentResource\RelationManagers;
+use App\Filament\Resources\EquipmentResource\RelationManagers\FsrsRelationManager;
 use App\Filament\Resources\EquipmentResource\RelationManagers\ProjectEquipmentsRelationManager;
 use App\Filament\Resources\EquipmentResource\RelationManagers\ProjectsRelationManager;
 use App\Filament\Resources\FsrResource\RelationManagers\EquipmentsRelationManager;
@@ -60,6 +61,7 @@ protected static ?string $label = 'Equipments';
             ->defaultPaginationPageOption(25)
             ->deferLoading()
             ->striped()
+            ->recordUrl(null)
             ->columns([
                 TextColumn::make('fsrs.fsr_no')
                     ->label('FSR')
@@ -107,7 +109,8 @@ protected static ?string $label = 'Equipments';
     public static function getRelations(): array
     {
         return [
-            ProjectsRelationManager::class
+            // ProjectsRelationManager::class
+            FsrsRelationManager::class
         ];
     }
 

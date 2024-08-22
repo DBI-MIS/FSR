@@ -5,9 +5,11 @@ namespace App\Filament\Resources\EquipmentResource\Pages;
 use App\Filament\Resources\EquipmentResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\Pages\ContentTabPosition;
 
 class EditEquipment extends EditRecord
 {
+    
     protected static string $resource = EquipmentResource::class;
 
     protected function getHeaderActions(): array
@@ -21,4 +23,11 @@ class EditEquipment extends EditRecord
     {
         return $this->getResource()::getUrl('index');
     }
+
+    public function hasCombinedRelationManagerTabsWithContent(): bool
+{
+    return true;
+}
+
+
 }

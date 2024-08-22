@@ -20,4 +20,6 @@ class ListEquipment extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+
+  
 }

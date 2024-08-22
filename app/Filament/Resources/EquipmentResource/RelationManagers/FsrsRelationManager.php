@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Filament\Resources\FsrEquipReplaceResource\RelationManagers;
+namespace App\Filament\Resources\EquipmentResource\RelationManagers;
 
-use App\Filament\Resources\FsrResource;
 use App\Models\Fsr;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -21,12 +20,12 @@ class FsrsRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
-        return FsrResource::form($form);
-        // return $form
-        //     ->schema([
-        //         Forms\Components\TextInput::make('fsr_no')
-        //             ->required(),
-        //     ]);
+        return $form
+            ->schema([
+                Forms\Components\TextInput::make('fsr_no')
+                    ->required()
+                    ->maxLength(255),
+            ]);
     }
 
     public function table(Table $table): Table
@@ -41,18 +40,14 @@ class FsrsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                // Tables\Actions\AttachAction::make()
-                // ->multiple()
-                // ->preloadRecordSelect()
-                // ->form(fn (AttachAction $action): array => [
-                //     $action->getRecordSelect(),
-                //     Forms\Components\TextInput::make('order')->numeric()->required(),
-                // ])
-                // ->recordSelectSearchColumns(['fsr_no',])
+                // Tables\Actions\AttachAction::make(),
+                // Tables\Actions\AssociateAction::make(),
+                // Tables\Actions\CreateAction::make(),
             ])
             ->actions([
                 Tables\Actions\DetachAction::make(),
-                Tables\Actions\ViewAction::make(),
+                // Tables\Actions\EditAction::make(),
+                // Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
