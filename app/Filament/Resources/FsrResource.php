@@ -828,7 +828,7 @@ class FsrResource extends Resource
                 ->label('Timeline')
                 ->icon('heroicon-m-magnifying-glass-circle')
                 ->url(fn (Fsr $record): string => route('filament.admin.resources.projects.view', $record->project_id)),
-                CommentsAction::make(),
+                
             
             ])
             

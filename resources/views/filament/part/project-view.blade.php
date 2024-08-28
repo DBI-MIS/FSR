@@ -46,7 +46,7 @@
                     <!-- Search Bar -->
                     <div class="mb-5 pt-2">
                         <input type="text" id="search" placeholder="Search by FSR No."
-                               class="w-[80%] p-3 border border-gray-300 rounded-md" oninput="filterFsrs()">
+                            class="w-[80%] p-3 border border-gray-300 rounded-md" oninput="filterFsrs()">
                     </div>
 
 
@@ -97,25 +97,31 @@
 
                                 <span class="text-sm text-gray-700 w-full block">Go to:</span>
                             </div>
-                            <div class="min-h-[300px] overflow-y-scroll hidden md:block">
-                            <ul>
+                            
+                            <div class="min-h-max overflow-y-scroll hidden md:flex md:flex-row gap-2 md:flex-wrap">
+
                                 @foreach ($latestFsrsByQuarter as $period => $fsr)
                                     @if ($fsr->id && $fsr->job_date_started)
-                                        <li class="block items-center gap-1">
+                                        <div class="block items-center gap-1 text-nowrap">
 
                                             <a href="#fsr-{{ $fsr->id }}"
                                                 class="text-gray-600 font-bold hover:text-blue-600">
                                                 @if ($fsr->job_date_started)
-                                                    {{ ' Q' . ceil(\Carbon\Carbon::parse($fsr->job_date_started)->month / 3) . ' - ' . \Carbon\Carbon::parse($fsr->job_date_started)->format('Y') }}
+                                                    {{ ' Q' . ceil(\Carbon\Carbon::parse($fsr->job_date_started)->month / 3) . '-' . \Carbon\Carbon::parse($fsr->job_date_started)->format('Y') }}
+                                                    @if (!$loop->last)
+                                                    |
+                                                    @endif
                                                 @else
                                                     N/A
                                                 @endif
                                             </a>
-                                        </li>
+                                        </div>
                                     @endif
                                 @endforeach
-                            </ul>
-                        </div>
+
+                            </div>
+
+
                         @endif
 
 
@@ -149,11 +155,13 @@
                                 <div class="flex flex-row justify-between items-center">
                                     <div class="flex flex-row items-center gap-2">
                                         <span class="text-sm text-gray-700">FSR No.:</span>
-                                        <div class="fsr-no text-xl text-gray-700 font-semibold" data-fsr-no="{{ $fsr->fsr_no }}">
-                                            <a href="{{ route('filament.admin.resources.fsrs.view', ['record' => $fsr->id]) }}" wire:navigate>
+                                        <div class="fsr-no text-xl text-gray-700 font-semibold"
+                                            data-fsr-no="{{ $fsr->fsr_no }}">
+                                            <a href="{{ route('filament.admin.resources.fsrs.view', ['record' => $fsr->id]) }}"
+                                                wire:navigate>
                                                 <span class="fsr-no-text">{{ $fsr->fsr_no }}</span>
-                                        </a>
-                                    </div>
+                                            </a>
+                                        </div>
                                     </div>
 
                                     <div class="block text-lg font-normal leading-none text-slate-500">
@@ -347,10 +355,13 @@
             if (fsrNo.includes(searchValue)) {
                 let regex = new RegExp(`(${searchValue})`, 'gi');
                 fsrNoElement.innerHTML = fsrNo.replace(regex, '<span class="bg-yellow-200">$1</span>');
-                
+
                 if (!foundMatch) {
                     // Scroll to the match and center it in the view
-                    fsr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    fsr.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
                     foundMatch = true;
                 }
             }

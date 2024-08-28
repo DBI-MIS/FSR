@@ -29,7 +29,7 @@ class ProjectResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
     public static function getNavigationBadge(): ?string
 {
@@ -37,7 +37,7 @@ class ProjectResource extends Resource
 }
 
 
-protected static ?string $navigationGroup = 'FSR';
+protected static ?string $navigationGroup = 'Projects';
 
     public static function form(Form $form): Form
     {
@@ -81,7 +81,7 @@ protected static ?string $navigationGroup = 'FSR';
                 'Under Warranty' => 'success',
                 'Out of Warranty' => 'warning',
                 'In House' => 'info',
-    })
+                })
             ])
             ->persistSortInSession()
             ->persistSearchInSession()

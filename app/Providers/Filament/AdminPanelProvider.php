@@ -103,9 +103,17 @@ class AdminPanelProvider extends PanelProvider
                     ->label('FSR')
                     ->icon('heroicon-o-flag')
                     ->collapsed(),
+                NavigationGroup::make('Projects')
+                    ->label('Projects')
+                    ->icon('heroicon-o-building-office-2')
+                    ->collapsed(),
                 NavigationGroup::make('Equipments')
                     ->label('Equipments')
                     ->icon('heroicon-o-wrench-screwdriver')
+                    ->collapsed(),
+                NavigationGroup::make('Personnels')
+                    ->label('Personnels')
+                    ->icon('heroicon-o-user-group')
                     ->collapsed(),
                 NavigationGroup::make('Settings')
                     ->label('Settings')

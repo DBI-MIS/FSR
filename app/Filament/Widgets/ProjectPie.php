@@ -24,7 +24,7 @@ class ProjectPie extends ChartWidget
 
     public function getDescription(): ?string
 {
-    return 'No. of FSR per Project';
+    return 'Top 10 Projects with the most FSRs';
 }
 
 protected static ?array $options = [

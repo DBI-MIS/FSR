@@ -27,14 +27,14 @@ class DbePersonnelResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 6;
 
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();
     }
 
-    protected static ?string $navigationGroup = 'FSR';
+    protected static ?string $navigationGroup = 'Personnels';
 
     protected static ?string $label = 'DBE Personnel';
 
@@ -46,9 +46,8 @@ class DbePersonnelResource extends Resource
                     ->description(' ')
                     ->schema([
                         FileUpload::make('profile_photo_path')
-                            ->image()
-                            ->avatar()
                             ->imageEditor()
+                            ->imageEditorMode(2)
                             ->circleCropper()
                             ->getUploadedFileNameForStorageUsing(
                                 fn(TemporaryUploadedFile $file): string => (string) str($file->getClientOriginalName())
@@ -57,8 +56,11 @@ class DbePersonnelResource extends Resource
                             ->label('Photo')
                             ->directory('profiles')
                             ->visibility('public')
+                            ->panelLayout('circle')
+                            ->panelAspectRatio('1:1')
+                            ->imageCropAspectRatio('1:1')
                             ->nullable(),
-                       
+
                     ])->columnSpan(1),
 
 
@@ -70,17 +72,17 @@ class DbePersonnelResource extends Resource
                             ->required(),
                         TextInput::make('designation')->nullable(),
                         ToggleButtons::make('employee_status')->inline()
-                        ->options([
-                            'Active' => 'Active',
-                            'Inactive' => 'Inactive',
-                            'Resigned' => 'Resigned',
-                        ])
-                        ->colors([
-                            'Active' => 'success',
-                            'Inactive' => 'info',
-                            'Resigned' => 'warning',
-                        ])
-                        ->nullable(),
+                            ->options([
+                                'Active' => 'Active',
+                                'Inactive' => 'Inactive',
+                                'Resigned' => 'Resigned',
+                            ])
+                            ->colors([
+                                'Active' => 'success',
+                                'Inactive' => 'info',
+                                'Resigned' => 'warning',
+                            ])
+                            ->nullable(),
 
 
                     ])->columnSpan(3),
@@ -96,6 +98,7 @@ class DbePersonnelResource extends Resource
             ->heading('DBE Personnels')
             ->defaultPaginationPageOption(25)
             ->deferLoading()
+            ->defaultSort('employee_status', 'asc')
             ->columns([
                 TextColumn::make('id')
                     ->searchable(),
@@ -113,10 +116,17 @@ class DbePersonnelResource extends Resource
                 TextColumn::make('designation')
                     ->searchable()
                     ->default('No Data'),
-                TextColumn::make('employee_status')->badge()
+                TextColumn::make('employee_status')
+                ->badge()
                     ->label('Status')
                     ->searchable()
-                    ->default('No Data'),
+                    ->default('No Data')
+                    ->sortable()
+                    ->color(fn (string $state): string => match ($state) {
+                        'Active' => 'success',
+                        'Inactive' => 'info',
+                        'Resigned' => 'warning',
+                        }),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
