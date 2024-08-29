@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\DbePersonnelResource\Pages;
 use App\Filament\Resources\DbePersonnelResource\RelationManagers;
 use App\Models\DbePersonnel;
+use DiscoveryDesign\FilamentGaze\Forms\Components\GazeBanner;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
@@ -100,6 +101,11 @@ class DbePersonnelResource extends Resource
             ->deferLoading()
             ->defaultSort('employee_status', 'asc')
             ->columns([
+                GazeBanner::make()
+                ->lock()
+                ->canTakeControl()
+                ->hideOnCreate()
+                ->columnSpanFull(),
                 TextColumn::make('id')
                     ->searchable(),
                 ImageColumn::make('profile_photo_path')

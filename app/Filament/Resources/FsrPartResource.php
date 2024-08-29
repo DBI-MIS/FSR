@@ -8,7 +8,7 @@ use App\Filament\Resources\FsrPartResource\RelationManagers;
 use App\Filament\Resources\FsrPartResource\RelationManagers\FsrRelationManager;
 use App\Filament\Resources\FsrPartResource\RelationManagers\ProjectRelationManager;
 use App\Models\FsrPart;
-
+use DiscoveryDesign\FilamentGaze\Forms\Components\GazeBanner;
 use Filament\Forms;
 use Filament\Infolists\Components\View;
 use Filament\Forms\Components\DatePicker;
@@ -51,6 +51,11 @@ class FsrPartResource extends Resource
     {
         return $form
             ->schema([
+                GazeBanner::make()
+                ->lock()
+                ->canTakeControl()
+                ->hideOnCreate()
+                ->columnSpanFull(),
 
                 Section::make()->schema([
                     Select::make('project_id')

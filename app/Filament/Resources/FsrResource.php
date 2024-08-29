@@ -14,6 +14,7 @@ use App\Models\FsrEquipReplace;
 use App\Models\Project;
 use App\Models\Rating;
 use Carbon\Carbon;
+use DiscoveryDesign\FilamentGaze\Forms\Components\GazeBanner;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
@@ -102,7 +103,13 @@ class FsrResource extends Resource
 
         return $form
             ->schema([
+                GazeBanner::make()
+                ->lock()
+                ->canTakeControl()
+                ->hideOnCreate()
+                ->columnSpanFull(),
                 Wizard::make([
+                    
                     //////////////////////////////////////////////////////////////////////////////////            
                     Wizard\Step::make('FSR Details')
                         ->description(' ')

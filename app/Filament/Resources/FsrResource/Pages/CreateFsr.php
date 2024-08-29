@@ -6,6 +6,7 @@ use App\Filament\Resources\FsrResource;
 use App\Models\Equipment;
 use App\Models\FsrEquipReplace;
 use Carbon\Carbon;
+use DiscoveryDesign\FilamentGaze\Forms\Components\GazeBanner;
 use Filament\Actions;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Fieldset;

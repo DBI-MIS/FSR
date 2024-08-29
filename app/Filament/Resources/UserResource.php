@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
+use DiscoveryDesign\FilamentGaze\Forms\Components\GazeBanner;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
@@ -40,6 +41,11 @@ protected static ?string $navigationGroup = 'Settings';
     {
         return $form
         ->schema([
+            GazeBanner::make()
+            ->lock()
+            ->canTakeControl()
+            ->hideOnCreate()
+            ->columnSpanFull(),
 
             FileUpload::make('picture')
             ->imageEditor()

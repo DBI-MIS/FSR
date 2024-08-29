@@ -9,6 +9,7 @@ use App\Filament\Resources\EquipmentResource\RelationManagers\ProjectEquipmentsR
 use App\Filament\Resources\EquipmentResource\RelationManagers\ProjectsRelationManager;
 use App\Filament\Resources\FsrResource\RelationManagers\EquipmentsRelationManager;
 use App\Models\Equipment;
+use DiscoveryDesign\FilamentGaze\Forms\Components\GazeBanner;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -42,6 +43,11 @@ protected static ?string $label = 'Equipments';
     {
         return $form
             ->schema([
+                GazeBanner::make()
+                ->lock()
+                ->canTakeControl()
+                ->hideOnCreate()
+                ->columnSpanFull(),
                 TextInput::make('brand')
                     ->nullable(),
                 TextInput::make('model')

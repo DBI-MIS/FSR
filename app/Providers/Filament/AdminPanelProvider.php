@@ -95,6 +95,7 @@ class AdminPanelProvider extends PanelProvider
                     ->setNavigationGroup('Settings')
                     ->setTitle('General Settings')
                     ->setNavigationLabel('General Settings'),
+                \DiscoveryDesign\FilamentGaze\FilamentGazePlugin::make(),
                 
             ])
             ->navigationGroups([

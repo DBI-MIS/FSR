@@ -8,6 +8,8 @@ use App\Filament\Resources\ProjectResource\RelationManagers;
 use App\Filament\Resources\ProjectResource\RelationManagers\EquipmentProjectsRelationManager;
 use App\Models\Equipment;
 use App\Models\Project;
+use App\Models\User;
+use DiscoveryDesign\FilamentGaze\Forms\Components\GazeBanner;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -43,6 +45,11 @@ protected static ?string $navigationGroup = 'Projects';
     {
         return $form
             ->schema([
+                GazeBanner::make()
+                ->lock()
+                ->canTakeControl()
+                ->hideOnCreate()
+                ->columnSpanFull(),
                 TextInput::make('name')->autocapitalize('words'),
                 ToggleButtons::make('warranty')->inline()
                 ->options([

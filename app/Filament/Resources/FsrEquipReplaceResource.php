@@ -6,6 +6,7 @@ use App\Filament\Resources\FsrEquipReplaceResource\Pages;
 use App\Filament\Resources\FsrEquipReplaceResource\RelationManagers;
 use App\Filament\Resources\FsrEquipReplaceResource\RelationManagers\FsrsRelationManager;
 use App\Models\FsrEquipReplace;
+use DiscoveryDesign\FilamentGaze\Forms\Components\GazeBanner;
 use Filament\Forms;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -40,6 +41,11 @@ class FsrEquipReplaceResource extends Resource
     {
         return $form
             ->schema([
+                GazeBanner::make()
+                ->lock()
+                ->canTakeControl()
+                ->hideOnCreate()
+                ->columnSpanFull(),
                 TextInput::make('brand')
                     ->nullable(),
                 TextInput::make('model')
