@@ -8,6 +8,7 @@ export default {
         './vendor/filament/**/*.blade.php',
         './resources/views/infolists/components/*.blade.php',
         './resources/views/filament/part/*.blade.php',
+        './resources/views/filament/daily-kanban/*.blade.php',
         './resources/**/*.blade.php',
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',

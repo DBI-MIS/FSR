@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
+
 class DbePersonnelResource extends Resource
 {
     protected static ?string $model = DbePersonnel::class;
@@ -46,6 +47,11 @@ class DbePersonnelResource extends Resource
                 Section::make(' ')
                     ->description(' ')
                     ->schema([
+                        GazeBanner::make()
+                ->lock()
+                ->canTakeControl()
+                ->hideOnCreate()
+                ->columnSpanFull(),
                         FileUpload::make('profile_photo_path')
                             ->imageEditor()
                             ->imageEditorMode(2)
@@ -101,11 +107,7 @@ class DbePersonnelResource extends Resource
             ->deferLoading()
             ->defaultSort('employee_status', 'asc')
             ->columns([
-                GazeBanner::make()
-                ->lock()
-                ->canTakeControl()
-                ->hideOnCreate()
-                ->columnSpanFull(),
+                
                 TextColumn::make('id')
                     ->searchable(),
                 ImageColumn::make('profile_photo_path')

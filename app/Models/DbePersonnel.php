@@ -20,7 +20,8 @@ class DbePersonnel extends Model implements Sortable
         'designation',
         'employee_status',
         'status',
-        'profile_photo_path'
+        'profile_photo_path',
+        'status_location'
     ];
 
     public function getProfile() 

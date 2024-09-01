@@ -9,8 +9,9 @@ enum DbePersonnelStatus: string
     use IsKanbanStatus;
 
     case Waiting = 'waiting';
-    case OnSite = 'on_site';
     case InOffice = 'in_office';
+    case OnSite = 'on_site';
+    
 
     public function getTitle(): string
     {

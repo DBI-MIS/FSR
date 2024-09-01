@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('designation')->nullable();
             $table->string('employee_status')->default('Active')->nullable();
             $table->string('status')->default('on_site')->nullable();
+            $table->string('status_location')->default('Edit Location')->nullable();
             $table->integer('order_column')->default(0);
             $table->timestamps();
         });
