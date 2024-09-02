@@ -48,7 +48,10 @@ class DbeDailyBoard extends KanbanBoard
 
     protected function records(): Collection
     {
-        return DbePersonnel::ordered()->where('employee_status', 'Active')->get();
+        return DbePersonnel::ordered()
+        ->where('employee_status', 'Active')
+        // ->groupBy('status_location')
+        ->get();
     }
 
     protected function getEditModalFormSchema(null|int $recordId): array
@@ -67,19 +70,9 @@ class DbeDailyBoard extends KanbanBoard
 
     protected function additionalRecordData(DbePersonnel $record): Collection
     {
-        
-        $groupedRecords = DbePersonnel::all()->groupBy('status_location');
-
-    return $groupedRecords->map(function ($records, $location) {
         return collect([
-            'location' => $location,
-            'records' => $records->map(function ($record) {
-                return collect([
-                    'photo' => $record->profile_photo_path,
-                    'location' => $record->status_location,
-                ]);
-            }),
+            'photo' => $record->profile_photo_path,
+            'location' => $record->status_location,
         ]);
-    });
     }
 }

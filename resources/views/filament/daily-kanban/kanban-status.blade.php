@@ -9,5 +9,8 @@
         @foreach($status['records'] as $record)
             @include(static::$recordView)
         @endforeach
+
+        
     </div>
 </div>
+
