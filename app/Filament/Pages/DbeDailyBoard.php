@@ -34,7 +34,7 @@ class DbeDailyBoard extends KanbanBoard
 
     protected string $editModalCancelButtonLabel = 'Cancel';
 
-    protected bool $editModalSlideOver = true;
+    protected bool $editModalSlideOver = false;
 
     protected static string $view = 'filament.daily-kanban.kanban-board';
 

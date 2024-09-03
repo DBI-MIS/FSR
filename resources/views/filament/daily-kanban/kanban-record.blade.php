@@ -14,7 +14,7 @@
 
     <div @class([
         'flex flex-row flex-wrap items-center',
-        'ml-0' =>
+        'ml-4' =>
             $loop->first &&
             ($record->status === 'waiting' || $record->status === 'in_office'),
         '-ml-4' =>

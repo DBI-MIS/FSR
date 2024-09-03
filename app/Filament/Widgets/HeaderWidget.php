@@ -19,9 +19,13 @@ class HeaderWidget extends Widget
 
     protected function getViewData(): array
     {
+      
+
         return [
             'currentTime' => Carbon::now(),
             'user' => Auth()->user(),
         ];
     }
+
+    
 }

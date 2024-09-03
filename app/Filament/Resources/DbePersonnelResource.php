@@ -134,6 +134,7 @@ class DbePersonnelResource extends Resource
                         'Active' => 'success',
                         'Inactive' => 'info',
                         'Resigned' => 'warning',
+                        'No Data' => 'info',
                         }),
                 TextColumn::make('created_at')
                     ->dateTime()
