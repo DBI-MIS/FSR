@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ProjectResource\Pages;
 
 use App\Filament\Resources\ProjectResource;
+use App\Filament\Widgets\ProjectViewHeader;
 use Carbon\Carbon;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -14,7 +15,6 @@ class ViewProject extends ViewRecord
     protected static string $resource = ProjectResource::class;
 
     protected static ?string $title = 'Project Timeline';
-
 
     public function getHeader(): ?View
 {
@@ -28,8 +28,7 @@ class ViewProject extends ViewRecord
         'currentDate' => $currentDate,
         'currentTime' => $currentTime,
         'backUrl' => $this->getResource()::getUrl('index'),
-        'projectName' => $this->record->name, 
-
+        'projectName' => $this->record->name,
         
     ]);
 }

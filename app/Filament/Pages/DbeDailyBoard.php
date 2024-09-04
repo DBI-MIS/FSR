@@ -3,6 +3,8 @@
 namespace App\Filament\Pages;
 
 use App\Enums\DbePersonnelStatus;
+use App\Filament\Widgets\DailyBoard;
+use App\Filament\Widgets\HeaderWidget;
 use App\Models\DbePersonnel;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Collection;
@@ -11,6 +13,8 @@ use Mokhosh\FilamentKanban\Pages\KanbanBoard;
 class DbeDailyBoard extends KanbanBoard
 {
     protected static string $model = DbePersonnel::class;
+    
+    protected int | string | array $columnSpan = 'full';
 
     protected static string $statusEnum = DbePersonnelStatus::class;
 
@@ -45,6 +49,13 @@ class DbeDailyBoard extends KanbanBoard
     protected static string $statusView = 'filament.daily-kanban.kanban-status';
 
     protected static string $scriptsView = 'filament.daily-kanban.kanban-scripts';
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            DailyBoard::class,
+        ];
+    }
 
     protected function records(): Collection
     {

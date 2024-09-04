@@ -113,20 +113,39 @@ class FsrResource extends Resource
                     //////////////////////////////////////////////////////////////////////////////////            
                     Wizard\Step::make('FSR Details')
                         ->description(' ')
-                        ->columns(4)
+                        ->columns([
+                            'default' => 4,
+                            'sm' => 1,
+                            'md' => 2,
+                            'lg' => 4, 
+                            'xl' => 4,
+                            ])
                         ->schema([
 
                             TextInput::make('fsr_no')
                                 ->label('FSR No.')
                                 ->unique(ignoreRecord: true)
-                                ->disabledOn('edit'),
+                                ->disabledOn('edit')
+                                ->columnSpan([
+                                    'default' => 'full',
+                                    'sm' => 'full',
+                                    'md' => 1,
+                                    'lg' => 1,
+                                    'xl' => 1,
+                                ]),
 
                             Select::make('project_id')
                                 ->live()
                                 ->label('Project/Client')
                                 ->relationship('project', 'name')
                                 ->searchable()
-                                ->columnSpan(2)
+                                ->columnSpan([
+                                    'default' => 'full',
+                                    'sm' => 'full',
+                                    'md' => 2,
+                                    'lg' => 2,
+                                    'xl' => 2,
+                                ])
                                 ->preload()
                                 ->nullable()
                                 ->createOptionForm([
@@ -150,6 +169,13 @@ class FsrResource extends Resource
                                 ->nullable()
                                 ->relationship('personnels', 'name')
                                 ->searchable()
+                                ->columnSpan([
+                                    'default' => 'full',
+                                    'sm' => 'full',
+                                    'md' => 1,
+                                    'lg' => 1,
+                                    'xl' => 1,
+                                ])
                                 ->preload()
                                 ->createOptionForm([
                                     Section::make(' ')
@@ -194,26 +220,50 @@ class FsrResource extends Resource
                 
                 
                                     ])->columnSpan(3),
-                                ])->createOptionModalHeading('Create New Project'),
+                                ])->createOptionModalHeading('Create New Personnel'),
 
                             DatePicker::make('job_date_started')
                                 ->label('Date Started')
-                                // ->timezone('Asia/Manila')
+                                ->columnSpan([
+                                    'default' => 2,
+                                    'sm' => 'full',
+                                    'md' => 1,
+                                    'lg' => 2,
+                                    'xl' => 1,
+                                ])
                                 ->date()
                                 ->default('Carbon::today()'),
                             TimePicker::make('time_arrived')
                                 ->label('Time Arrived')
-                                // ->timezone('Asia/Manila')
+                                ->columnSpan([
+                                    'default' => 2,
+                                    'sm' => 'full',
+                                    'md' => 1,
+                                    'lg' => 2,
+                                    'xl' => 1,
+                                ])
                                 ->time()
                                 ->default(Carbon::now()),
                             DatePicker::make('job_date_finished')
                                 ->label('Date Finished')
-                                // ->timezone('Asia/Manila')
+                                ->columnSpan([
+                                    'default' => 2,
+                                    'sm' => 'full',
+                                    'md' => 1,
+                                    'lg' => 2,
+                                    'xl' => 1,
+                                ])
                                 ->date()
                                 ->default(Carbon::today()),
                             TimePicker::make('time_completed')
                                 ->label('Time Completed')
-                                // ->timezone('Asia/Manila')
+                                ->columnSpan([
+                                    'default' => 2,
+                                    'sm' => 'full',
+                                    'md' => 1,
+                                    'lg' => 2,
+                                    'xl' => 1,
+                                ])
                                 ->time()
                                 ->default(Carbon::now()),
 

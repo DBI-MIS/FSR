@@ -10,18 +10,18 @@
             <div href="{{route('filament.admin.resources.fsrs.create')}}"
             wire:navigate class="w-full text-nowrap text-center cursor-pointer text-sm font-bold ">
             <span>+</span>
-            <span>Add FSR</span>
+            <span>FSR</span>
             </div>
             <div href="{{route('filament.admin.resources.projects.create')}}"
             wire:navigate class="w-full text-nowrap text-center cursor-pointer text-sm font-bold">
             <span>+</span>
-            <span>Add Project</span>
+            <span>Project</span>
             
         </div>
             <div href="{{route('filament.admin.resources.dbe-personnels.create')}}"
             wire:navigate class="w-full text-nowrap text-center cursor-pointer text-sm font-bold">
             <span>+</span>
-            <span>Add DBE Personnel</span>
+            <span>DBE Personnel</span>
             
         </div>
            

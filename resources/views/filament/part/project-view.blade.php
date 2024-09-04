@@ -1,56 +1,75 @@
 <div class="w-full">
-
-
-    <div class="max-w-[90%] py-4 px-6 bg-white rounded-lg shadow-lg shadow-black/20 mx-auto mb-20 min-h-screen">
-
-
-
+    {{-- <x-filament::loading-indicator class="h-5 w-5" /> --}}
+    
+    <div class="max-w-full pb-4 px-6 mx-auto mb-20 min-h-screen">
+        
         @php
             $sortedFsrs = $getRecord()->fsrs->sortByDesc(function ($fsr) {
                 return $fsr->job_date_started;
             });
         @endphp
 
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-10">
+        
             <!-- Title and Description Section -->
-            <div class="col-span-2">
-                <div class="fixed min-h-min" style="max-width: 260px">
-                    <span class="text-sm text-gray-700">Project/Client:</span>
-                    <h2 class="text-3xl font-bold mb-5 text-gray-900 dark:text-white">{{ $getRecord()->name ?? '-' }}
-                    </h2>
+            <div class="flex flex-col z-10 sticky top-0">
+                <div id="sticky-div" class="w-full hidden" style="min-height: 60px">
+                                
+                </div>
+                
+                <div class="flex flex-col min-h-min bg-white py-4 px-4 border border-gray-300 rounded-lg w-full gap-4 relative">
+                    
+                        
+                        <!-- Project Title -->
+                        <div class="flex flex-col w-full items-start">
+                            
+                        <span class="text-sm text-gray-700">Project/Client:</span>
+                        <h2 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $getRecord()->name ?? '-' }}
+                        </h2>
+                        </div>
+                        
+                        <button data-tooltip-target="tooltip-default" onclick="scrollToTop()" class=" text-white rounded h-min absolute top-1 right-0 p-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" id="Arrow-Up-Large-2--Streamline-Sharp" height="20" width="20"><desc>Arrow Up Large 2 Streamline Icon: https://streamlinehq.com</desc><g id="arrow-up-large-2--move-up-arrow-arrows-large-head"><path id="Vector (Stroke)" fill="#2859c5" fill-rule="evenodd" d="m22.5 3.938 -21 0 0 -3 21 0 0 3Z" clip-rule="evenodd" stroke-width="1"></path><path id="Union" fill="#8fbffa" fill-rule="evenodd" d="m12 5.875 8.012 8.011v2.67h-5.508V23h-5v-6.443H3.989v-2.67l8.012 -8.012Z" clip-rule="evenodd" stroke-width="1"></path></g></svg>
+                        </button>
 
-                    <span class="text-sm text-gray-700">Address:</span>
-                    <p class="text-xl font-bold mb-5 text-gray-900">{{ $getRecord()->address ?? '-' }}</p>
+                        <div class="flex flex-col md:flex-row justify-between">
+                        
 
-                    <span class="text-sm text-gray-700">Status:</span>
-                    <p class="text-base font-bold mb-5 mt-1 text-gray-900">
-                        {{-- based sa project table --}}
-                        @php
-                            $warrantyStatus = $getRecord()->warranty ?? '-';
-                            $badgeColor = 'bg-gray-400';
-
-                            if ($warrantyStatus === 'Under Warranty') {
-                                $badgeColor = 'bg-green-600 text-white';
-                            } elseif ($warrantyStatus === 'Out of Warranty') {
-                                $badgeColor = 'bg-red-600 text-white';
-                            } elseif ($warrantyStatus === 'In House') {
-                                $badgeColor = 'bg-blue-600 text-white';
-                            }
-                        @endphp
-
-                        <span class="px-2 py-1 rounded {{ $badgeColor }}">
-                            {{ $warrantyStatus }}
-                        </span>
-                    </p>
-
-                    <!-- Search Bar -->
-                    <div class="mb-5 pt-2">
-                        <input type="text" id="search" placeholder="Search by FSR No."
-                            class="w-[80%] p-3 border border-gray-300 rounded-md" oninput="filterFsrs()">
-                    </div>
-
+                        <div class="flex flex-row gap-2">
+                            <p class="text-xs font-bold my-1 text-gray-900">
+                                
+                                @php
+                                    $warrantyStatus = $getRecord()->warranty ?? '-';
+                                    $badgeColor = 'bg-gray-400';
+        
+                                    if ($warrantyStatus === 'Under Warranty') {
+                                        $badgeColor = 'bg-green-600 text-white';
+                                    } elseif ($warrantyStatus === 'Out of Warranty') {
+                                        $badgeColor = 'bg-red-600 text-white';
+                                    } elseif ($warrantyStatus === 'In House') {
+                                        $badgeColor = 'bg-blue-600 text-white';
+                                    }
+                                @endphp
+        
+                                <span class="px-2 py-1 rounded {{ $badgeColor }}">
+                                    {{ $warrantyStatus }}
+                                </span>
+                            </p>
+        
+                        </div>
+                        <!-- Search Bar -->
+                        <div class="">
+                            <input type="text" id="search" placeholder="Search by FSR No."
+                                class="w-full p-1 border border-gray-300 rounded-md" oninput="filterFsrs()">
+                        </div>
+                   </div>
+                   
+                    
+                   
 
                     <div>
+
+                       
+
                         @php
                             use Carbon\Carbon;
 
@@ -78,26 +97,26 @@
                         @if ($latestFsrsByQuarter)
 
 
-                            <div class="md:flex flex-row items-center gap-1 hidden">
-                                <div class="w-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        id="Text-Flow-Rows--Streamline-Sharp">
-                                        <desc>Text Flow Rows Streamline Icon: https://streamlinehq.com
-                                        </desc>
-                                        <g id="text-flow-rows">
-                                            <path id="Union" fill="#8fbffa" fill-rule="evenodd"
-                                                d="M19.3842 2.9749H4.0688V5.1628H16.7434L3.2954 18.6108L1.428 20.4781H18.2902V23.76H19.3842L23.76 19.3842L19.3842 15.0084H18.2902V18.2902H6.7096L20.1576 4.8423L22.025 2.9749H19.3842Z"
-                                                clip-rule="evenodd" stroke-width="1"></path>
-                                            <path id="Union_2" fill="#2859c5" fill-rule="evenodd"
-                                                d="M0.24 0.24H7.8977V7.8977H0.24V0.24ZM0.24 15.5553H7.8977V23.213H0.24V15.5553ZM23.213 0.24H15.5553V7.8977H23.213V0.24Z"
-                                                clip-rule="evenodd" stroke-width="1"></path>
-                                        </g>
-                                    </svg>
-                                </div>
+                        <details class="border-t px-2 pb-2 group hidden md:flex">
+                            <summary
+                                class="text-sm text-gray-700 mr-2 cursor-pointer flex justify-between items-center list-none ">
 
-                                <span class="text-sm text-gray-700 w-full block">Go to:</span>
-                            </div>
-                            
+                                <span class="text-sm text-gray-700">
+                                    Go to:
+                                </span>
+
+                                <span class="transition group-open:rotate-180">
+                                    <svg fill="none" height="24"
+                                        shape-rendering="geometricPrecision" stroke="currentColor"
+                                        stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="1.5" viewBox="0 0 24 24" width="24">
+                                        <path d="M6 9l6 6 6-6">
+                                        </path>
+
+                                    </svg>
+                                </span>
+                            </summary>
+
                             <div class="min-h-max overflow-y-scroll hidden md:flex md:flex-row gap-2 md:flex-wrap">
 
                                 @foreach ($latestFsrsByQuarter as $period => $fsr)
@@ -105,7 +124,7 @@
                                         <div class="block items-center gap-1 text-nowrap">
 
                                             <a href="#fsr-{{ $fsr->id }}"
-                                                class="text-gray-600 font-bold hover:text-blue-600">
+                                                class="text-gray-600 font-bold hover:text-blue-600 scroll-to-center">
                                                 @if ($fsr->job_date_started)
                                                     {{ ' Q' . ceil(\Carbon\Carbon::parse($fsr->job_date_started)->month / 3) . '-' . \Carbon\Carbon::parse($fsr->job_date_started)->format('Y') }}
                                                     @if (!$loop->last)
@@ -120,23 +139,21 @@
                                 @endforeach
 
                             </div>
-
+                        </details>
 
                         @endif
 
 
                     </div>
-
+                
                 </div>
-
+            
             </div>
 
             <!-- Timeline Section -->
-            <div class="col-span-3 min-h-[500px]">
+            <div class="pt-6  mx-auto" style="max-width: 800px; padding-left: 24px">
                 <h1 class="text-2xl font-bold mb-10">Timeline View</h1>
                 <ul class="relative border-l-4 border-sky-600" id="fsr-list">
-
-
 
                     @forelse ($sortedFsrs as $fsr)
 
@@ -152,8 +169,8 @@
                             </span>
                             <div class="flex flex-col gap-2">
 
-                                <div class="flex flex-row justify-between items-center">
-                                    <div class="flex flex-row items-center gap-2">
+                                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                                    <div class="flex flex-col sm:flex-row sm:items-center sm:gap-2">
                                         <span class="text-sm text-gray-700">FSR No.:</span>
                                         <div class="fsr-no text-xl text-gray-700 font-semibold"
                                             data-fsr-no="{{ $fsr->fsr_no }}">
@@ -332,7 +349,7 @@
                     @endforelse
                 </ul>
             </div>
-        </div>
+        
     </div>
 
 
@@ -340,6 +357,14 @@
 </div>
 
 <script>
+
+    function scrollToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+
     function filterFsrs() {
         let searchValue = document.getElementById('search').value.toLowerCase();
         let fsrItems = document.querySelectorAll('.fsr-item');
@@ -367,4 +392,30 @@
             }
         });
     }
+
+    document.querySelectorAll('.scroll-to-center').forEach(link => {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'center'
+                });
+            }
+        });
+    });
+
+    const stickyDiv = document.getElementById('sticky-div');
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 0) {
+        stickyDiv.classList.remove('hidden'); // Remove the hidden class
+        stickyDiv.classList.add('block'); // Add the block class to make it visible
+    } else {
+        stickyDiv.classList.remove('block'); // Remove the block class
+        stickyDiv.classList.add('hidden'); // Add the hidden class to hide it again
+    }
+});
 </script>

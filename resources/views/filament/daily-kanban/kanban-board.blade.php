@@ -1,4 +1,5 @@
 <x-filament-panels::page>
+   <div>
     <div x-data wire:ignore.self class="flex flex-col gap-x-2 ">
         @foreach($statuses as $status)
             @include(static::$statusView)
@@ -12,4 +13,6 @@
     @unless($disableEditModal)
         <x-filament-kanban::edit-record-modal/>
     @endunless
+</div>
+
 </x-filament-panels::page>

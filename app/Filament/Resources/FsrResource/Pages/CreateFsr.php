@@ -45,20 +45,39 @@ class CreateFsr extends CreateRecord
         return [
             Step::make('FSR Details')
                 ->description(' ')
-                ->columns(4)
+                ->columns([
+                    'default' => 4,
+                    'sm' => 1,
+                    'md' => 2,
+                    'lg' => 4, 
+                    'xl' => 4,
+                    ])
                 ->schema([
 
                     TextInput::make('fsr_no')
                         ->label('FSR No.')
                         ->unique(ignoreRecord: true)
-                        ->disabledOn('edit'),
+                        ->disabledOn('edit')
+                        ->columnSpan([
+                            'default' => 'full',
+                            'sm' => 'full',
+                            'md' => 1,
+                            'lg' => 1,
+                            'xl' => 1,
+                        ]),
 
                     Select::make('project_id')
                         ->live()
                         ->label('Project/Client')
                         ->relationship('project', 'name')
                         ->searchable()
-                        ->columnSpan(2)
+                        ->columnSpan([
+                            'default' => 'full',
+                            'sm' => 'full',
+                            'md' => 2,
+                            'lg' => 2,
+                            'xl' => 2,
+                        ])
                         ->preload()
                         ->createOptionForm([
                             TextInput::make('name')->autocapitalize('words'),
@@ -81,7 +100,13 @@ class CreateFsr extends CreateRecord
                         ->nullable()
                         ->relationship('personnels', 'name')
                         ->searchable()
-                        ->columnSpan(1)
+                        ->columnSpan([
+                            'default' => 'full',
+                            'sm' => 'full',
+                            'md' => 1,
+                            'lg' => 1,
+                            'xl' => 1,
+                        ])
                         ->preload()
                         ->createOptionForm([
                             Section::make(' ')
@@ -127,25 +152,49 @@ class CreateFsr extends CreateRecord
                         ->label('Date Started')
                         ->date()
                         ->nullable()
-                        // ->timezone('Asia/Manila')
+                        ->columnSpan([
+                            'default' => 2,
+                            'sm' => 'full',
+                            'md' => 1,
+                            'lg' => 2,
+                            'xl' => 1,
+                        ])
                         ->default(Carbon::today()),
                     TimePicker::make('time_arrived')
                         ->label('Time Arrived')
                         ->time()
                         ->nullable()
-                        // ->timezone('Asia/Manila')
+                        ->columnSpan([
+                            'default' => 2,
+                            'sm' => 'full',
+                            'md' => 1,
+                            'lg' => 2,
+                            'xl' => 1,
+                        ])
                         ->default(Carbon::now()),
                     DatePicker::make('job_date_finished')
                         ->label('Date Finished')
                         ->date()
                         ->nullable()
-                        // ->timezone('Asia/Manila')
+                        ->columnSpan([
+                            'default' => 2,
+                            'sm' => 'full',
+                            'md' => 1,
+                            'lg' => 2,
+                            'xl' => 1,
+                        ])
                         ->default(Carbon::today()),
                     TimePicker::make('time_completed')
                         ->label('Time Completed')
                         ->time()
                         ->nullable()
-                        // ->timezone('Asia/Manila')
+                        ->columnSpan([
+                            'default' => 2,
+                            'sm' => 'full',
+                            'md' => 1,
+                            'lg' => 2,
+                            'xl' => 1,
+                        ])
                         ->default(Carbon::now()),
 
 
@@ -670,7 +719,7 @@ class CreateFsr extends CreateRecord
                     Select::make('user_id')
                         ->relationship('author', 'name')
                         ->default(Auth::user()->id)
-                        ->disabled()
+                        // ->disabled()
                         ->columnSpan(1),
                 ])
                 ->columnSpanFull(),
