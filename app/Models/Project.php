@@ -13,7 +13,7 @@ class Project extends Model
     use HasFactory;
     use HasFilamentComments;
 
-     /**
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -27,11 +27,11 @@ class Project extends Model
         'address',
     ];
 
-    
+
 
     public function fsr()
     {
-        return $this->hasOne(Fsr::class);
+        return $this->hasOne(Fsr::class, 'project_id');
     }
 
     public function fsrs()
@@ -39,10 +39,30 @@ class Project extends Model
         return $this->hasMany(Fsr::class);
     }
 
-
-    public function equipmentprojects()
+    public function dbeDirectories()
     {
-        return $this->belongsToMany(Equipment::class, 'equipment_projects')->withPivot(['order'])->withTimestamps();
+        return $this->hasMany(DbeDirectory::class, 'project_id');
     }
-  
+
+
+    // public function equipments()
+    // {
+
+    //     $fsrs = $this->fsrs()->pluck('id');
+
+    //     return Equipment::whereHas('fsrs', function($query) use ($fsrs) {
+    //         $query->whereIn('fsr_id', $fsrs);
+    //     })->get();
+    // }
+
+    // public function equipmentss()
+    // {
+    //     return $this->hasManyThrough(Equipment::class, Fsr::class, 'project_id', 'id', 'id', 'id');
+    // }
+
+    // public function equipmentprojects()
+    // {
+    //     return $this->belongsToMany(Equipment::class, 'equipment_projects')->withPivot(['order'])->withTimestamps();
+    // }
+
 }

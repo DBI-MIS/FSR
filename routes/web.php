@@ -2,8 +2,13 @@
 
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\DownloadPdfController;
+use App\Http\Controllers\ProjectController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
+
+
+// Route::get('/project/{record}/equipments', [ProjectController::class, 'viewEquipments'])->name('projects.equipments');
+
 
 // Route::get('/fsr/{id}/download-pdf', [DownloadPdfController::class, '__invoke'])->name('fsr.downloadPdf');
 

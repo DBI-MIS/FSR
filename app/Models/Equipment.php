@@ -24,4 +24,10 @@ class Equipment extends Model
     {
         return $this->belongsToMany(Fsr::class, 'fsr_equipments')->withPivot(['order'])->withTimestamps();
     }
+
+
+    // public function project()
+    // {
+    //     return $this->hasManyThrough(Project::class, 'equipment_projects', Fsr::class, 'fsr_equipments');
+    // }
 }

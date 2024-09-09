@@ -28,7 +28,7 @@ class ViewProject extends ViewRecord
         'currentDate' => $currentDate,
         'currentTime' => $currentTime,
         'backUrl' => $this->getResource()::getUrl('index'),
-        'projectName' => $this->record->name,
+        // 'projectName' => $this->record->name,
         
     ]);
 }

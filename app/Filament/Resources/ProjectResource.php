@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\FsrEquipReplaceResource\RelationManagers\FsrsRelationManager;
 use App\Filament\Resources\ProjectResource\Pages;
+use App\Filament\Resources\ProjectResource\Pages\ViewEquipments;
 use App\Filament\Resources\ProjectResource\RelationManagers;
 use App\Filament\Resources\ProjectResource\RelationManagers\EquipmentProjectsRelationManager;
 use App\Models\Equipment;
@@ -99,6 +100,11 @@ protected static ?string $navigationGroup = 'Projects';
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ViewAction::make()->label('Timeline'),
+                Tables\Actions\Action::make('view')
+                ->label('Equipments')
+                ->icon('heroicon-o-archive-box-arrow-down')
+                ->url(fn (Project $record): string => route('filament.admin.resources.projects.equipments', $record->id))
+                // ->url(fn (Project $record): string => route('filament.part.project-equipment-view', $record->id)),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -138,6 +144,8 @@ protected static ?string $navigationGroup = 'Projects';
             'create' => Pages\CreateProject::route('/create'),
             'edit' => Pages\EditProject::route('/{record}/edit'),
             'view' => Pages\ViewProject::route('/{record}'),
+            'equipments' => Pages\ViewEquipments::route('/{record}/equipments'),
+            
         ];
     }
 }

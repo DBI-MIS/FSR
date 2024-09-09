@@ -7,6 +7,7 @@
             $sortedFsrs = $getRecord()->fsrs->sortByDesc(function ($fsr) {
                 return $fsr->job_date_started;
             });
+
         @endphp
 
         
@@ -351,8 +352,6 @@
             </div>
         
     </div>
-
-
 
 </div>
 

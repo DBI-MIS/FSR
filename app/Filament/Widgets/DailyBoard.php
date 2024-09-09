@@ -12,6 +12,8 @@ class DailyBoard extends Widget
 
     protected static string $view = 'filament.widgets.daily-board';
 
+    protected static bool $isDiscovered = false;
+
     protected function getViewData(): array
     {
       
