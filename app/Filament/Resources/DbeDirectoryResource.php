@@ -9,12 +9,14 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
+use Filament\Forms\Components\Grid;
 use Filament\Infolists\Components\Component;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -37,35 +39,39 @@ class DbeDirectoryResource extends Resource
     {
         return $form
             ->schema([
+                
                 Section::make()->schema([
                     Select::make('project_id')
                     ->live()
                     ->label('Project/Client')
-                    ->relationship('project', 'name')
+                    ->relationship('directoryproject', 'name')
                     ->searchable()
                     ->preload()
-                    ->nullable(),
-                    TextInput::make('contact_person')
-                    ->label('Contact Name'),
-                    TextInput::make('email_address')
-                        ->email()
-                        ->label('Email Address'),
-                    TextInput::make('designation'),
-                ])->columnSpan(2),
+                    ->nullable(),                   
 
-            
-                Section::make()->schema([
-                    Repeater::make('contact_no') 
-                        ->schema([
-                            TextInput::make('contact_no') 
-                                ->label('Contact No.')
-                                ->tel(),
-                        ])
-                        ->addActionLabel('+ Another Contact'),
                 ])->columnSpan(1),
-                
-                
-                
+                Section::make('CONTACT DETAILS')->schema([
+                    Repeater::make('contact_id')
+                        ->relationship('contactsdbe') 
+                        ->schema([
+                            Grid::make(2)->schema([
+                                TextInput::make('contact_no')
+                                    ->label('Contact No.')
+                                    ->tel(),
+                                TextInput::make('contact_person')
+                                    ->label('Contact Name'),
+                            ]),
+                            Grid::make(2)->schema([
+                                TextInput::make('email_address')
+                                    ->email()
+                                    ->label('Email Address'),
+                                TextInput::make('designation')
+                                    ->label('Designation'),
+                            ]),
+                        ])
+                        ->minItems(1) // Ensure at least one contact
+                        ->addActionLabel('+ Add Another Contact'),
+                ])->columnSpan(2),
             ])->columns(3);
     }
 
@@ -79,7 +85,7 @@ class DbeDirectoryResource extends Resource
         ])
         ->contentGrid([
             'default' => 3,
-            'lg' => 2,
+            'lg' => 3,
         ])
 
             // ->columns([
@@ -135,6 +141,12 @@ class DbeDirectoryResource extends Resource
         ]);
         
     }
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['directoryproject.relatedfsrs']); 
+    }
+    
     public static function getRelations(): array
     {
         return [

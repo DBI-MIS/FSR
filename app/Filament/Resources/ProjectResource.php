@@ -82,14 +82,14 @@ protected static ?string $navigationGroup = 'Projects';
                 TextColumn::make('address')
                 ->default('No Data'),
                 
-                TextColumn::make('warranty')
-                ->default('No Data')
-                ->badge()
-                ->color(fn (string $state): string => match ($state) {
-                'Under Warranty' => 'success',
-                'Out of Warranty' => 'warning',
-                'In House' => 'info',
-                })
+                // TextColumn::make('warranty')
+                // ->default('No Data')
+                // ->badge()
+                // ->color(fn (string $state): string => match ($state) {
+                // 'Under Warranty' => 'success',
+                // 'Out of Warranty' => 'warning',
+                // 'In House' => 'info',
+                // })
             ])
             ->persistSortInSession()
             ->persistSearchInSession()
@@ -101,10 +101,13 @@ protected static ?string $navigationGroup = 'Projects';
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ViewAction::make()->label('Timeline'),
                 Tables\Actions\Action::make('view')
-                ->label('Equipments')
+                ->label('Equipment')
                 ->icon('heroicon-o-archive-box-arrow-down')
-                ->url(fn (Project $record): string => route('filament.admin.resources.projects.equipments', $record->id))
-                // ->url(fn (Project $record): string => route('filament.part.project-equipment-view', $record->id)),
+                ->url(fn (Project $record): string => route('filament.admin.resources.projects.equipments', $record->id)),
+                Tables\Actions\Action::make('view')
+                ->label('History')
+                ->icon('heroicon-o-archive-box-arrow-down')
+                ->url(fn (Project $record): string => route('filament.admin.resources.projects.history', $record->id))
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -145,6 +148,7 @@ protected static ?string $navigationGroup = 'Projects';
             'edit' => Pages\EditProject::route('/{record}/edit'),
             'view' => Pages\ViewProject::route('/{record}'),
             'equipments' => Pages\ViewEquipments::route('/{record}/equipments'),
+            'history' => Pages\ViewHistory::route('/{record}/history'),
             
         ];
     }

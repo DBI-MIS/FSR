@@ -38,11 +38,20 @@ class Project extends Model
     {
         return $this->hasMany(Fsr::class);
     }
-
-    public function dbeDirectories()
+    public function relatedfsrs()
+    {
+        return $this->hasMany(Fsr::class, 'project_id');
+    }
+    
+    public function projectdirectories()
     {
         return $this->hasMany(DbeDirectory::class, 'project_id');
     }
+    public function projectdirectory()
+    {
+        return $this->hasOne(DbeDirectory::class, 'project_id');
+    }
+
 
 
     // public function equipments()

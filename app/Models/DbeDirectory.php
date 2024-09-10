@@ -12,17 +12,15 @@ class DbeDirectory extends Model
 
     
     protected $casts = [
-        'contact_no' => 'array',
+        // 'contacts' => 'array',
     ];
     
     protected $fillable = [
-        'contact_no',
-        'contact_person',
-        'designation',
-        'email_address',
+        'project_id',
+        'latest_fsr',
         'status',
     ];
-    public function project()
+    public function directoryproject()
     {
         return $this->belongsTo(Project::class, 'project_id');
     }
@@ -31,4 +29,10 @@ class DbeDirectory extends Model
     {
         return $this->hasMany(Fsr::class);
     }
+
+    public function contactsdbe()
+    {
+        return $this->belongsToMany(Contact::class, 'contacts_directory')->withTimestamps();
+    }
+
 }
