@@ -27,6 +27,7 @@ use Filament\Tables\Table;
 use Filament\Tables\Columns\Layout\View as LayoutView;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\View;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class DbeDirectoryResource extends Resource
@@ -47,7 +48,12 @@ class DbeDirectoryResource extends Resource
                     ->relationship('directoryproject', 'name')
                     ->searchable()
                     ->preload()
-                    ->nullable(),                   
+                    ->nullable(),
+
+                    TextInput::make('status')
+                    ->visibleOn('edit')
+                    ->label('Status')
+                    ->disabled(),                 
 
                 ])->columnSpan(1),
                 Section::make('CONTACT DETAILS')->schema([
@@ -84,8 +90,8 @@ class DbeDirectoryResource extends Resource
 
         ])
         ->contentGrid([
-            'default' => 3,
-            'lg' => 3,
+            // 'default' => 3,
+            'lg' => 1,
         ])
 
             // ->columns([
@@ -131,7 +137,6 @@ class DbeDirectoryResource extends Resource
                 ]),
             ]);
     }
-
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist

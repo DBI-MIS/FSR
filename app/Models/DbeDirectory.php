@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class DbeDirectory extends Model
 {
@@ -34,5 +36,6 @@ class DbeDirectory extends Model
     {
         return $this->belongsToMany(Contact::class, 'contacts_directory')->withTimestamps();
     }
-
+   
+  
 }

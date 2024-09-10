@@ -22,16 +22,11 @@ class ListDbeDirectories extends ListRecords
             ->processCollectionUsing(function (string $modelClass, Collection $collection) {
                 $collection->each(function ($row) use ($modelClass) {
 
-                    $contactToString = $row['contact_no'];
-                    $contactToArray = explode(',', $contactToString);
+                   
                     $modelClass::create([
                         
                         'project_id' => $row['project_id'],
-                        'contact_no' =>  $contactToArray,
-                        'contact_person' => $row['contact_person'],
-                        'designation' => $row['designation'],
-                        'email_address' => $row['email_address'],
-                        'fsr_id' => $row['fsr_id'],
+                        'latest_fsr' => $row['latest_fsr'],
                         'status' => $row['status'],
                     ]);
                 });
