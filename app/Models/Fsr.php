@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 use Parallax\FilamentComments\Models\Traits\HasFilamentComments;
 
 class Fsr extends Model
@@ -136,5 +138,48 @@ class Fsr extends Model
     public function replacements()
     {
         return $this->belongsToMany(FsrEquipReplace::class, 'fsr_replacements')->withPivot(['order'])->withTimestamps();
+    }
+    
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($fsr) {
+            self::updateDbeDirectoryStatus($fsr->project_id);
+        });
+
+        static::updated(function ($fsr) {
+            self::updateDbeDirectoryStatus($fsr->project_id);
+        });
+        static::deleted(function ($fsr) {
+            self::updateDbeDirectoryStatus($fsr->project_id);
+        });
+        
+
+       
+    }
+
+
+    protected static function updateDbeDirectoryStatus($projectId)
+    {
+        if ($projectId) {
+
+            $latestFsr = DB::table('fsrs')
+                ->where('project_id', $projectId)
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if ($latestFsr) {
+                $fsrDate = Carbon::parse($latestFsr->job_date_started);
+
+                $status = $fsrDate->diffInMonths(Carbon::now()) > 12 ? 'inactive' : 'active';
+            } else {
+                $status = 'inactive';
+            }
+
+            DB::table('dbe_directories')
+                ->where('project_id', $projectId)
+                ->update(['status' => $status]);
+        }
     }
 }

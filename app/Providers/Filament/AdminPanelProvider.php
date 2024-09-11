@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Auth\CustomLogin;
+use App\Filament\Pages\Auth\EditProfile;
 use App\Filament\Pages\Monitor;
 use App\Filament\Resources\FsrResource\Widgets\FsrOverview;
 use App\Filament\Resources\FsrResource\Widgets\LatestFsr;
@@ -11,6 +12,7 @@ use App\Filament\Widgets\HeaderWidget;
 use App\Filament\Widgets\HeaderWidgetLite;
 use App\Filament\Widgets\ProjectPie;
 use App\Filament\Widgets\ProjectStatus;
+use App\Models\User;
 use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -52,6 +54,13 @@ class AdminPanelProvider extends PanelProvider
             ->defaultThemeMode(ThemeMode::Light)
             ->font('Lato')
             ->darkMode(false)
+            // ->profile(isSimple: false)
+            ->profile(EditProfile::class)
+            ->passwordReset()
+            ->emailVerification()
+            ->unsavedChangesAlerts()
+            ->brandLogo(asset('DB_LOGO_SOLO.svg'))
+            ->brandLogoHeight('2.8rem')
             // ->brandName('FSR')
             ->colors([
                 'primary' => Color::Sky,
@@ -90,13 +99,13 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentGeneralSettingsPlugin::make()
-                    ->canAccess(fn() => auth()->user()->id === 1)
+                    ->canAccess(fn() => User::find(1)->isAdmin()) 
                     ->setSort(19)
                     ->setIcon('heroicon-o-cog')
                     ->setNavigationGroup('Settings')
                     ->setTitle('General Settings')
                     ->setNavigationLabel('General Settings'),
-                    FilamentGazePlugin::make(),
+                FilamentGazePlugin::make(),
                 
             ])
             ->navigationGroups([
@@ -116,6 +125,10 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make('Personnels')
                     ->label('Personnels')
                     ->icon('heroicon-o-user-group')
+                    ->collapsed(),
+                NavigationGroup::make('Directory')
+                    ->label('Directory')
+                    ->icon('heroicon-o-identification')
                     ->collapsed(),
                 NavigationGroup::make('Settings')
                     ->label('Settings')

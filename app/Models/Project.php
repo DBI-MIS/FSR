@@ -38,6 +38,7 @@ class Project extends Model
     {
         return $this->hasMany(Fsr::class);
     }
+   
     public function relatedfsrs()
     {
         return $this->hasMany(Fsr::class, 'project_id');

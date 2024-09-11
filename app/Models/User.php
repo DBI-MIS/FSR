@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements  HasAvatar
 {
     use HasFactory, Notifiable;
 
@@ -37,6 +37,10 @@ class User extends Authenticatable
         return $this->role === self::ROLE_EDITOR;
     }
 
+    public function getFilamentAvatarUrl(): ?string
+    {
+        return $this->picture ? asset('storage/' . $this->picture) : null;
+    }
 
 
     /**

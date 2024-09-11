@@ -24,6 +24,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Infolists\Infolist;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Enums\ActionsPosition;
 use Parallax\FilamentComments\Infolists\Components\CommentsEntry;
 
 class ProjectResource extends Resource
@@ -73,6 +75,7 @@ protected static ?string $navigationGroup = 'Projects';
         return $table
             ->heading('Projects / Clients')
             ->defaultPaginationPageOption(25)
+            ->recordUrl(null)
             ->deferLoading()
             ->columns([
                 TextColumn::make('id')->sortable()
@@ -98,16 +101,25 @@ protected static ?string $navigationGroup = 'Projects';
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\ViewAction::make()->label('Timeline'),
+              
+                Tables\Actions\EditAction::make()
+                ->label(' ')
+                ->tooltip('Edit'),
+                Tables\Actions\ViewAction::make()
+                ->label(' ')
+                ->icon('heroicon-o-presentation-chart-line')
+                ->tooltip('Timeline'),
                 Tables\Actions\Action::make('view')
-                ->label('Equipment')
+                ->label(' ')
+                ->tooltip('Equipment')
                 ->icon('heroicon-o-archive-box-arrow-down')
                 ->url(fn (Project $record): string => route('filament.admin.resources.projects.equipments', $record->id)),
                 Tables\Actions\Action::make('view')
-                ->label('History')
-                ->icon('heroicon-o-archive-box-arrow-down')
+                ->label(' ')
+                ->tooltip('History')
+                ->icon('heroicon-o-clock')
                 ->url(fn (Project $record): string => route('filament.admin.resources.projects.history', $record->id))
+           
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

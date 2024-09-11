@@ -1,8 +1,14 @@
 <x-pulse>
-    
+
     <livewire:pulse.servers cols="full" />
 
     <livewire:pulse.usage cols="4" rows="2" />
+
+    <livewire:pulse.usage type="requests" cols="4" rows="2"/>
+
+    <livewire:pulse.usage type="slow_requests" cols="4" rows="2" />
+
+    <livewire:pulse.usage type="jobs" cols="4" rows="2" />
 
     <livewire:pulse.queues cols="4" />
 

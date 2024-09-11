@@ -8,6 +8,7 @@ use Filament\Forms\Components\TimePicker;
 use Illuminate\Support\ServiceProvider;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
+use Laravel\Pulse\Facades\Pulse;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,5 +28,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('viewPulse', function (User $user) {
             return $user->isAdmin();
         });
+
+        Pulse::user(fn ($user) => [
+            'name' => $user->name,
+            'extra' => $user->email,
+            'avatar' => asset('storage/' . $user->picture) ? asset('DB_LOGO_SOLO.svg') : null,
+        ]);
     }
 }

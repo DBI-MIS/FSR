@@ -9,7 +9,7 @@ use Filament\Resources\Pages\ViewRecord;
 class ViewDbeDirectory extends ViewRecord
 {
     protected static string $resource = DbeDirectoryResource::class;
-    protected static ?string $title = 'DBE Telephone Directory';
+    protected static ?string $title = 'Directory';
     protected function getHeaderActions(): array
     {
         return [

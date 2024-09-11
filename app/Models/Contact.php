@@ -9,6 +9,10 @@ class Contact extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'contact_no' => 'array',
+    ];
+
     protected $fillable = [
         'dbe_directory_id', 
         'contact_no', 
