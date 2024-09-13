@@ -34,6 +34,9 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Joaopaulolndev\FilamentGeneralSettings\FilamentGeneralSettingsPlugin;
 use DiscoveryDesign\FilamentGaze\FilamentGazePlugin;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\View as FacadesView;
+use Illuminate\View\View as ViewView;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -99,15 +102,20 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentGeneralSettingsPlugin::make()
-                    ->canAccess(fn() => User::find(1)->isAdmin()) 
+                    ->canAccess(fn() => User::find(1)->isAdmin())
                     ->setSort(19)
                     ->setIcon('heroicon-o-cog')
                     ->setNavigationGroup('Settings')
                     ->setTitle('General Settings')
                     ->setNavigationLabel('General Settings'),
                 FilamentGazePlugin::make(),
-                
+
             ])
+
+            // ->renderHook(
+            //     'panels::footer',
+            //     fn(): View => view('filament.loader'),
+            // )
             ->navigationGroups([
 
                 NavigationGroup::make('FSR')

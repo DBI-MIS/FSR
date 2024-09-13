@@ -1,4 +1,5 @@
 <x-filament-widgets::widget>
+    
    
         <div class="w-full flex flex-col min-h-[100px] items-center justify-between gap-4 bg-white px-6 py-4 rounded-xl border-slate-200 border shadow-sm">
             <div class="w-full flex items-center justify-between">

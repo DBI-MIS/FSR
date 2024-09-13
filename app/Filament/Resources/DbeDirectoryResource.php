@@ -20,6 +20,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\View;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -29,7 +30,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\Layout\View as LayoutView;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Infolists\Components\View;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
 use Filament\Tables\Filters\SelectFilter;
@@ -92,54 +92,73 @@ class DbeDirectoryResource extends Resource
                 ])->columnSpan(2),
                 Section::make('CONTACT DETAILS')->schema([
                     Repeater::make('contact_id')
-                    ->label('Contact Information')
-                    ->relationship('contactsdbe')
-                    ->schema([
-                        Split::make([
-                            Section::make()->schema([
-                                TextInput::make('contact_person')
-                                ->label('Contact Name')
-                                ->columnSpanFull(),
-                                TextInput::make('email_address')
-                                ->email()
-                                ->label('Email Address')
-                                ->required()
-                                ->columnSpanFull(),
-                                TextInput::make('designation')
-                                ->label('Designation')
-                                ->required()
-                                ->columnSpanFull(),
-                            ])->columnSpan(2),
-                                        
-                            Repeater::make('contact_no')
-                            ->label('Contact No.')
-                            ->schema([
-                                TextInput::make('contact_no')
-                                ->tel()
-                                ->label('Phone Number')
-                                ->maxLength(15),
-                            ])
-                            ->required()
-                            ->minItems(1)
-                            ->addActionLabel('Add Another Phone Number')
-                            ->columnSpan(2),
-                                        
-                        ])->columnSpan(4)
-                    ])
-                    ->columnSpan(4)
-                    ->minItems(1)
-                    ->addActionLabel('+ Add Another Contact'),
-                                    
+                        ->label('Contact Information')
+                        ->relationship('contactsdbe')
+                        ->schema([
+                            Split::make([
+                                Section::make()->schema([
+                                    TextInput::make('contact_person')
+                                        ->prefixIcon('heroicon-m-user-circle')
+                                        ->label('Contact Name')
+                                        ->columnSpanFull(),
+                                    TextInput::make('email_address')
+                                        ->prefixIcon('heroicon-m-envelope')
+                                        ->email()
+                                        ->label('Email Address')
+                                        ->nullable()
+                                        ->columnSpanFull(),
+                                    TextInput::make('designation')
+                                        ->prefixIcon('heroicon-m-briefcase')
+                                        ->label('Designation')
+                                        ->nullable()
+                                        ->columnSpanFull(),
+                                ])->columnSpan(2),
+
+                                Repeater::make('contact_no')
+                                    ->label('Contact No.')
+                                    ->hint('Use "loc" for local')
+                                    ->schema([
+                                        TextInput::make('contact_no')
+                                            ->prefixIcon('heroicon-m-phone')
+                                            ->nullable()
+                                            ->tel()
+                                            // ->telRegex('/^(\+63\s?\d{1,2}[\s-]?\d{3}[\s-]?\d{4}(\s+loc\s+\d{0,5})?|\+639\d{9}|\d{11}|\d{3}[\s-]?\d{4}(\s+loc\s+\d{0,5})?)$/')
+                                            // ->telRegex('/^(\+\d{1,4}[\s-]?\d{1,4}[\s-]?\d{1,4}[\s-]?\d{1,9}(\s+loc\s+\d{0,5})?|\d{1,4}[\s-]?\d{1,9}(\s+loc\s+\d{0,5})?)$/')
+                                            // ->telRegex('/^(\+\d{1,4}[\s-]?\d{1,4}[\s-]?\d{1,4}[\s-]?\d{1,9}(\s+loc\s+\d{0,6})?|\d{1,4}[\s-]?\d{1,9}(\s+loc\s+\d{0,6})?|\d{7}\s+loc\s+\d{3}(\s+to\s+\d{3})?)$/')
+                                            // ->telRegex('/^(\+\d{1,4}[\s-]?\d{1,4}[\s-]?\d{1,4}[\s-]?\d{1,9}(\s+loc\s+\d{0,6}(\s+to\s+\d{1,6})?)?|\d{1,4}[\s-]?\d{1,9}(\s+loc\s+\d{0,6}(\s+to\s+\d{1,6})?)?|\d{7}\s+loc\s+\d{3}(\s+to\s+\d{3})?)$/')
+                                            ->telRegex('/^(\+\d{1,4}[\s-]?\d{1,4}[\s-]?\d{1,4}[\s-]?\d{1,9}(\s+loc\s+\d{0,6}(\s+to\s+\d{1,6})?)?|\d{1,4}[\s-]?\d{1,9}(\s+to\s+\d{1,9})?(\s+loc\s+\d{0,6}(\s+to\s+\d{1,6})?)?|\d{7}\s+loc\s+\d{3}(\s+to\s+\d{3})?)$/')
+                                            ->label(fn($livewire) => $livewire instanceof \Filament\Resources\Pages\EditRecord ? 'Edit Phone Number' : 'Add No.'),
+                                    ])
+                                    ->required()
+                                    ->minItems(1)
+                                    ->collapsed()
+                                    ->itemLabel(fn(array $state): ?string => $state['contact_no'] ?? null)
+                                    ->addActionLabel('+ Another Phone Number')
+                                    ->columnSpan(2),
+
+                            ])->columnSpan(4)
+                        ])
+                        ->columnSpan(4)
+                        ->minItems(1)
+                        ->addActionLabel('+ Another Contact'),
+
                 ])->columnSpan(4)
             ])->columns(6);
     }
 
+
+
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(null)
+            // ->searchable()
+            ->emptyStateHeading('No Record')
+            // ->defaultSort('status', 'desc')
+            ->defaultPaginationPageOption(25)
+            ->striped()
             ->columns([
                 LayoutView::make('filament.table.dbe-directory')
-
 
             ])
             ->contentGrid([
@@ -177,6 +196,26 @@ class DbeDirectoryResource extends Resource
             // ])
             ->filters(
                 [
+                    Filter::make('contactsdbe')
+                        ->form([
+                            TextInput::make('search')->label('Search')
+                                ->helperText(' '),
+                        ])
+                        ->query(function (Builder $query, array $data): Builder {
+                            if (!empty($data['search'])) {
+                                $searchTerm = $data['search'];
+
+                                return $query->whereHas('contactsdbe', function ($subQuery) use ($searchTerm) {
+                                    $subQuery->where('contact_no', 'like', '%' . $searchTerm . '%')
+                                        ->orWhere('contact_person', 'like', '%' . $searchTerm . '%')
+                                        ->orWhere('email_address', 'like', '%' . $searchTerm . '%')
+                                        ->orWhere('designation', 'like', '%' . $searchTerm . '%');
+                                });
+                            }
+
+                            return $query;
+                        }),
+
 
                     SelectFilter::make('project_id')
 
@@ -191,6 +230,7 @@ class DbeDirectoryResource extends Resource
                             'active' => 'active',
                             'inactive' => 'inactive',
                         ]),
+
 
 
                     // Filter::make('directoryproject.name')
@@ -218,7 +258,6 @@ class DbeDirectoryResource extends Resource
                 layout: FiltersLayout::AboveContent
             )
             ->filtersFormColumns(3)
-
             ->actions([
 
                 Tables\Actions\EditAction::make(),

@@ -104,12 +104,12 @@ class FsrResource extends Resource
         return $form
             ->schema([
                 GazeBanner::make()
-                ->lock()
-                ->canTakeControl()
-                ->hideOnCreate()
-                ->columnSpanFull(),
+                    ->lock()
+                    ->canTakeControl()
+                    ->hideOnCreate()
+                    ->columnSpanFull(),
                 Wizard::make([
-                    
+
                     //////////////////////////////////////////////////////////////////////////////////            
                     Wizard\Step::make('FSR Details')
                         ->description(' ')
@@ -117,9 +117,9 @@ class FsrResource extends Resource
                             'default' => 4,
                             'sm' => 1,
                             'md' => 2,
-                            'lg' => 4, 
+                            'lg' => 4,
                             'xl' => 4,
-                            ])
+                        ])
                         ->schema([
 
                             TextInput::make('fsr_no')
@@ -179,47 +179,47 @@ class FsrResource extends Resource
                                 ->preload()
                                 ->createOptionForm([
                                     Section::make(' ')
-                                    ->description(' ')
-                                    ->schema([
-                                        FileUpload::make('profile_photo_path')
-                                            ->image()
-                                            ->avatar()
-                                            ->imageEditor()
-                                            ->circleCropper()
-                                            ->getUploadedFileNameForStorageUsing(
-                                                fn(TemporaryUploadedFile $file): string => (string) str($file->getClientOriginalName())
-                                                    ->prepend('profile-photo-'),
-                                            )
-                                            ->label('Photo')
-                                            ->directory('profiles')
-                                            ->visibility('public')
-                                            ->nullable(),
-                                       
-                                    ])->columnSpan(1),
-                
-                
-                
-                                Section::make(' ')
-                                    ->description(' ')
-                                    ->schema([
-                                        TextInput::make('name')
-                                            ->required(),
-                                        TextInput::make('designation')->nullable(),
-                                        ToggleButtons::make('employee_status')->inline()
-                                        ->options([
-                                            'Active' => 'Active',
-                                            'Inactive' => 'Inactive',
-                                            'Resigned' => 'Resigned',
-                                        ])
-                                        ->colors([
-                                            'Active' => 'success',
-                                            'Inactive' => 'info',
-                                            'Resigned' => 'warning',
-                                        ])
-                                        ->nullable(),
-                
-                
-                                    ])->columnSpan(3),
+                                        ->description(' ')
+                                        ->schema([
+                                            FileUpload::make('profile_photo_path')
+                                                ->image()
+                                                ->avatar()
+                                                ->imageEditor()
+                                                ->circleCropper()
+                                                ->getUploadedFileNameForStorageUsing(
+                                                    fn(TemporaryUploadedFile $file): string => (string) str($file->getClientOriginalName())
+                                                        ->prepend('profile-photo-'),
+                                                )
+                                                ->label('Photo')
+                                                ->directory('profiles')
+                                                ->visibility('public')
+                                                ->nullable(),
+
+                                        ])->columnSpan(1),
+
+
+
+                                    Section::make(' ')
+                                        ->description(' ')
+                                        ->schema([
+                                            TextInput::make('name')
+                                                ->required(),
+                                            TextInput::make('designation')->nullable(),
+                                            ToggleButtons::make('employee_status')->inline()
+                                                ->options([
+                                                    'Active' => 'Active',
+                                                    'Inactive' => 'Inactive',
+                                                    'Resigned' => 'Resigned',
+                                                ])
+                                                ->colors([
+                                                    'Active' => 'success',
+                                                    'Inactive' => 'info',
+                                                    'Resigned' => 'warning',
+                                                ])
+                                                ->nullable(),
+
+
+                                        ])->columnSpan(3),
                                 ])->createOptionModalHeading('Create New Personnel'),
 
                             DatePicker::make('job_date_started')
@@ -323,7 +323,7 @@ class FsrResource extends Resource
                                 ->relationship('equipments', 'model')
                                 ->searchable()
                                 ->nullable()
-                                ->getOptionLabelFromRecordUsing(fn (Equipment $record) => "{$record->brand} - {$record->model} | Serial No.:{$record->serial}")
+                                ->getOptionLabelFromRecordUsing(fn(Equipment $record) => "{$record->brand} - {$record->model} | Serial No.:{$record->serial}")
                                 ->searchable(['brand', 'model', 'serial'])
                                 ->createOptionForm([
                                     TextInput::make('brand')
@@ -337,7 +337,7 @@ class FsrResource extends Resource
                                         ->nullable()
                                         ->rows(3),
                                 ])->createOptionModalHeading('Create New Equipment'),
-                                
+
                             Fieldset::make('Voltage')
                                 ->columns(3)
                                 ->schema([
@@ -662,7 +662,7 @@ class FsrResource extends Resource
                                 ->nullable()
                                 ->searchable()
                                 ->columnSpan(4)
-                                ->getOptionLabelFromRecordUsing(fn (FsrEquipReplace $record) => "{$record->brand} - {$record->model} | Part No.:{$record->part_no}")
+                                ->getOptionLabelFromRecordUsing(fn(FsrEquipReplace $record) => "{$record->brand} - {$record->model} | Part No.:{$record->part_no}")
                                 ->searchable(['brand', 'model', 'part_no'])
                                 ->preload()
                                 ->createOptionForm([
@@ -839,56 +839,101 @@ class FsrResource extends Resource
             ->persistSearchInSession()
             ->persistColumnSearchesInSession()
 
-            ->filters([
-                Filter::make('fsr_no')
-                    ->form([
-                        TextInput::make('fsr_no')->label('FSR No.')
-                            ->helperText('Search FSR No. only'),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        if (!empty($data['fsr_no'])) {
-                            $fsrNo = $data['fsr_no'];
-                            return $query->where('fsr_no', 'like', '%' . $fsrNo . '%');
-                        }
-                        return $query;
-                    }),
+            ->filters(
+                [
+                    // Filter::make('fsr_no')
+                    //     ->form([
+                    //         TextInput::make('fsr_no')->label('FSR No.')
+                    //             ->helperText('Search FSR No. only'),
+                    //     ])
+                    //     ->query(function (Builder $query, array $data): Builder {
+                    //         if (!empty($data['fsr_no'])) {
+                    //             $fsrNo = $data['fsr_no'];
+                    //             return $query->where('fsr_no', 'like', '%' . $fsrNo . '%');
+                    //         }
+                    //         return $query;
+                    //     }),
+                    Filter::make('fsr_no')
+                        ->form([
+                            TextInput::make('fsr_no')->label('FSR No.')
+                                ->helperText('Search FSR No. only'),
+                            Select::make('fsr_no_duplicate')
+                                ->label('FSR No. Duplicate Filter')
+                                ->options([
+                                    'all' => 'All FSRs',
+                                    'duplicate' => 'Duplicate FSRs',
+                                    'unique' => 'Unique FSRs',
+                                ])
+                                ->default('all'),
+                        ])
+                        ->query(function (Builder $query, array $data): Builder {
+                            // Filter by FSR No.
+                            if (!empty($data['fsr_no'])) {
+                                $fsrNo = $data['fsr_no'];
+                                $query->where('fsr_no', 'like', '%' . $fsrNo . '%');
+                            }
 
-                Filter::make('attended_to')
-                    ->form([
-                        TextInput::make('attended_to')->label('FSR Type')
-                            ->helperText('ex.: Preventive Maintenance, Trouble Call or Hauling'),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        if (!empty($data['attended_to'])) {
-                            $fsrNo = $data['attended_to'];
-                            return $query->where('attended_to', 'like', '%' . $fsrNo . '%');
-                        }
-                        return $query;
-                    }),
-                SelectFilter::make('project_id')
+                            // Filter for duplicates or unique based on the selected option
+                            if (!empty($data['fsr_no_duplicate'])) {
+                                if ($data['fsr_no_duplicate'] === 'duplicate') {
+                                    $query->whereIn('fsr_no', function ($subQuery) {
+                                        $subQuery->select('fsr_no')
+                                            ->from('fsrs')
+                                            ->groupBy('fsr_no')
+                                            ->havingRaw('COUNT(fsr_no) > 1');
+                                    });
+                                } elseif ($data['fsr_no_duplicate'] === 'unique') {
+                                    $query->whereNotIn('fsr_no', function ($subQuery) {
+                                        $subQuery->select('fsr_no')
+                                            ->from('fsrs')
+                                            ->groupBy('fsr_no')
+                                            ->havingRaw('COUNT(fsr_no) > 1');
+                                    });
+                                }
+                            }
 
-                    ->label('Project/Client')
-                    ->relationship('project', 'name')
-                    ->multiple()
-                    ->preload()
-                    ->searchable(),
+                            return $query;
+                        }),
 
-            ],
-            // layout: FiltersLayout::AboveContentCollapsible)
-            layout: FiltersLayout::AboveContent)
+
+
+                    Filter::make('attended_to')
+                        ->form([
+                            TextInput::make('attended_to')->label('FSR Type')
+                                ->helperText('ex.: Preventive Maintenance, Trouble Call or Hauling'),
+                        ])
+                        ->query(function (Builder $query, array $data): Builder {
+                            if (!empty($data['attended_to'])) {
+                                $fsrNo = $data['attended_to'];
+                                return $query->where('attended_to', 'like', '%' . $fsrNo . '%');
+                            }
+                            return $query;
+                        }),
+                    SelectFilter::make('project_id')
+
+                        ->label('Project/Client')
+                        ->relationship('project', 'name')
+                        ->multiple()
+                        ->preload()
+                        ->searchable(),
+
+                ],
+                // layout: FiltersLayout::AboveContentCollapsible)
+                layout: FiltersLayout::AboveContent
+            )
             ->filtersFormColumns(4)
             ->actions([
-                
+
                 EditAction::make(),
                 ViewAction::make(),
                 ViewAction::make('timeline')
-                ->label('Timeline')
-                ->icon('heroicon-m-magnifying-glass-circle')
-                ->url(fn (Fsr $record): string => route('filament.admin.resources.projects.view', $record->project_id)),
-                
-            
+                    ->label('Timeline')
+                    ->icon('heroicon-m-magnifying-glass-circle')
+                    ->url(fn(Fsr $record): string => route('filament.admin.resources.projects.view', $record->project_id)),
+
+
             ])
-            
+
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

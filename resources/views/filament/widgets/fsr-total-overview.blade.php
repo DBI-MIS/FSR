@@ -1,4 +1,7 @@
 <x-filament-widgets::widget>
+    <div wire:loading.inline>
+        <x-filament::loading-indicator class="h-10 w-10 mx-auto" />
+    </div>
     
         <div class="w-full grid grid-cols-2 gap-4">
             
