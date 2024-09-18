@@ -13,6 +13,7 @@ use App\Filament\Widgets\HeaderWidgetLite;
 use App\Filament\Widgets\ProjectPie;
 use App\Filament\Widgets\ProjectStatus;
 use App\Models\User;
+use CharrafiMed\GlobalSearchModal\GlobalSearchModalPlugin;
 use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -103,6 +104,7 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->plugins([
                 FilamentGeneralSettingsPlugin::make()
                     ->canAccess(fn() => User::find(1)->isAdmin())
@@ -112,6 +114,8 @@ class AdminPanelProvider extends PanelProvider
                     ->setTitle('General Settings')
                     ->setNavigationLabel('General Settings'),
                 FilamentGazePlugin::make(),
+                GlobalSearchModalPlugin::make()
+
     
 
             ])

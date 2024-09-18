@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\DbeDirectoryResource\Pages;
 use App\Filament\Resources\DbeDirectoryResource\RelationManagers;
+use App\Models\Contact;
 use App\Models\DbeDirectory;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -46,6 +47,25 @@ class DbeDirectoryResource extends Resource
     protected static ?string $label = 'Client';
 
     protected static ?int $navigationSort = 1;
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'directoryproject.name',
+            'contactsdbe.contact_person',
+            'contactsdbe.contact_no',
+            'contactsdbe.email_address',
+            'contactsdbe.designation',
+        ];
+    }
+
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->with(['contactsdbe', 'directoryproject']);
+    }
+
+
+
 
     public static function getNavigationBadge(): ?string
     {
