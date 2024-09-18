@@ -5,14 +5,15 @@
     @endphp
     <div class="overflow-hidden rounded-lg w-full relative">
         {{-- <input type="checkbox" name="detail-one" id="detail-one" /> --}}
-        <div wire:loading class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" >
-         
-            <x-filament::loading-indicator class="h-10 w-10 mx-auto z-50" />
-        
-        </div>
+       
 
         <details open
-            class="bg-gradient-to-br from-sky-600 to-sky-900 px-3 flex flex-col md:flex-row justify-between md:items-center w-full py-2 group ">
+            class="bg-gradient-to-br from-sky-600 to-sky-900 px-3 flex flex-col md:flex-row justify-between md:items-center w-full py-2 group relative">
+            <div wire:loading class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" >
+         
+                <x-filament::loading-indicator class="h-10 w-10 mx-auto z-50" />
+            
+            </div>
             
             <summary
                 class="text-sm text-gray-700 mr-2 cursor-pointer flex flex-col md:flex-row justify-between items-center list-none ">

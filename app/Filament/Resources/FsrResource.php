@@ -40,7 +40,6 @@ use Filament\Resources\Resource;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
-use Filament\Tables\Columns\Column;
 use Filament\Tables\Columns\Layout\Grid;
 use Filament\Tables\Columns\Layout\Panel;
 use Filament\Tables\Columns\Layout\Split as LayoutSplit;
@@ -64,6 +63,7 @@ use Filament\Notifications\Collection;
 use Filament\Resources\RelationManagers\RelationGroup;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\EditAction;
+// use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\Layout\View as LayoutView;
 use Filament\Tables\Enums\ActionsPosition;
@@ -76,6 +76,11 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Parallax\FilamentComments\Infolists\Components\CommentsEntry;
 use Parallax\FilamentComments\Tables\Actions\CommentsAction;
+use pxlrbt\FilamentExcel\Actions\Pages\ExportAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use pxlrbt\FilamentExcel\Columns\Column;
+
 
 class FsrResource extends Resource
 {
@@ -898,6 +903,7 @@ class FsrResource extends Resource
 
 
                     Filter::make('attended_to')
+                
                         ->form([
                             TextInput::make('attended_to')->label('FSR Type')
                                 ->helperText('ex.: Preventive Maintenance, Trouble Call or Hauling'),
@@ -937,6 +943,25 @@ class FsrResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    ExportBulkAction::make()->exports([
+                        ExcelExport::make()
+                        ->askForFilename()
+                        ->withFilename(fn ($filename) => ''. $filename)
+                        ->withColumns([
+                            Column::make('fsr_no'),
+                            Column::make('time_arrived'),
+                            Column::make('time_completed'),
+                            Column::make('job_date_started')
+                            ->heading('Date Started'),
+                            Column::make('job_date_finished')
+                            ->heading('Date Finished'),
+                            Column::make('project.name')
+                            ->heading('Project Name'),
+                            Column::make('attended_to'),
+                            Column::make('encoder'),
+                        ])
+                    ])
+                    ->label('Export Selected')
                 ]),
             ]);
     }

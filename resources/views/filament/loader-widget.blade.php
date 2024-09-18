@@ -1,4 +1,4 @@
-<div
+{{-- <div
     x-cloak
     x-show="$store.isLoading.value"
     class="fixed inset-0 flex justify-center items-center z-[6000001] bg-white/50 backdrop-blur-sm"
@@ -28,4 +28,9 @@
     </script>
 
 
+</div> --}}
+
+<div class="flex flex-row items-center bg-white p-4 rounded-lg shadow-lg">
+    <span>Loading...</span>
+    <x-filament::loading-indicator class="h-10 w-10 ml-2" />
 </div>

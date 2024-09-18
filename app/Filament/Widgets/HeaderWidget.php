@@ -17,9 +17,8 @@ class HeaderWidget extends Widget
 
     protected static string $view = 'filament.widgets.header-widget';
 
-    protected function getViewData(): array
+    public function getViewData(): array
     {
-      
 
         return [
             'currentTime' => Carbon::now(),

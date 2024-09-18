@@ -20,7 +20,8 @@ class FsrTotalOverview extends Widget
 
     protected static string $view = 'filament.widgets.fsr-total-overview';
 
-    protected function getViewData(): array
+    public function getViewData(): array
+    
     {
 
         $counts = [

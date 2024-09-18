@@ -14,7 +14,7 @@ class DailyBoard extends Widget
 
     protected static bool $isDiscovered = false;
 
-    protected function getViewData(): array
+    public function getViewData(): array
     {
       
 

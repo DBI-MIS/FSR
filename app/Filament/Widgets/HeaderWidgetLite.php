@@ -19,7 +19,7 @@ class HeaderWidgetLite extends Widget
 
     protected static string $view = 'filament.widgets.header-widget-lite';
 
-    protected function getViewData(): array
+    public function getViewData(): array
     {
 
         $counts = [

@@ -34,7 +34,10 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Joaopaulolndev\FilamentGeneralSettings\FilamentGeneralSettingsPlugin;
 use DiscoveryDesign\FilamentGaze\FilamentGazePlugin;
+use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View as FacadesView;
 use Illuminate\View\View as ViewView;
 
@@ -109,12 +112,14 @@ class AdminPanelProvider extends PanelProvider
                     ->setTitle('General Settings')
                     ->setNavigationLabel('General Settings'),
                 FilamentGazePlugin::make(),
+    
 
             ])
 
             // ->renderHook(
-            //     'panels::footer',
-            //     fn(): View => view('filament.loader'),
+            //    'widgets::table-widget.start',
+            //     fn (array $scopes): View => view('filament.loader-widget', ['scopes' => $scopes]),
+            //     scopes: \Livewire\Livewire::current(),
             // )
             ->navigationGroups([
 

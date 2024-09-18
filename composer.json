@@ -22,6 +22,7 @@
         "mokhosh/filament-kanban": "^2.8",
         "parallax/filament-comments": "^1.3",
         "psr/simple-cache": "2.0",
+        "pxlrbt/filament-excel": "^2.3",
         "spatie/eloquent-sortable": "^4.3",
         "spatie/laravel-pdf": "^1.5",
         "tomatophp/filament-notes": "^1.0",

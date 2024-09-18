@@ -8,6 +8,9 @@ use EightyNine\ExcelImport\ExcelImportAction;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Support\Collection;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Columns\Column;
 
 class ListFsrs extends ListRecords
 {
@@ -117,7 +120,33 @@ class ListFsrs extends ListRecords
 
                     return $collection;
                 }),
-            Actions\CreateAction::make(),
+             // Export Action
+            //  ExportAction::make('export')
+            //  ->label('Export')
+            //  ->icon('heroicon-o-download')
+            //  ->color('success')
+            //  ->withColumns([
+            //      'fsr_no' => 'FSR No.',
+            //      'user_id' => 'User ID',
+            //      'time_arrived' => 'Time Arrived',
+            //      'time_completed' => 'Time Completed',
+            //      'job_date_started' => 'Job Date Started',
+            //      'job_date_finished' => 'Job Date Finished',
+            //      'project_id' => 'Project ID',
+            //      'concerns' => 'concerns',
+            //      'service_rendered' => 'service_rendered',
+            //      'recommendation' => 'recommendation',
+            //  ]),
+            // ExportAction::make()->exports([
+            //     ExcelExport::make()->withColumns([
+            //         Column::make('fsr_no'),
+            //         Column::make('created_at'),
+            //         Column::make('deleted_at'),
+            //     ]),
+            // ]),
+         Actions\CreateAction::make(),
+            
         ];
+        
     }
 }
