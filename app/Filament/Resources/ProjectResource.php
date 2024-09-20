@@ -16,6 +16,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
+use Filament\GlobalSearch\Actions\Action;
 use Filament\Infolists\Components\View;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -26,6 +27,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Infolists\Infolist;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Enums\ActionsPosition;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
 use Parallax\FilamentComments\Infolists\Components\CommentsEntry;
 
 class ProjectResource extends Resource
@@ -41,8 +44,36 @@ class ProjectResource extends Resource
     return static::getModel()::count();
 }
 
-
 protected static ?string $navigationGroup = 'Projects';
+
+protected static ?string $recordTitleAttribute = 'name';
+
+public static function getGloballySearchableAttributes(): array
+{
+    return ['name', 'address',];
+}
+
+public static function getGlobalSearchResultDetails(Model $record): array
+{
+    return [
+        'Project' => $record->name,
+        'Address' => $record->address,
+    ];
+}
+
+public static function getGlobalSearchResultUrl(Model $record): string
+{
+    return ProjectResource::getUrl('view', ['record' => $record]);
+}
+
+public static function getGlobalSearchResultActions(Model $record): array
+{
+    return [
+        Action::make('edit')
+            ->url(static::getUrl('edit', ['record' => $record])),
+    ];
+}
+
 
     public static function form(Form $form): Form
     {
@@ -81,7 +112,8 @@ protected static ?string $navigationGroup = 'Projects';
                 TextColumn::make('id')->sortable()
                 ->default('No Data'),
                 TextColumn::make('name')->searchable()
-                ->default('No Data'),
+                ->default('No Data')
+                ->searchable(),
                 TextColumn::make('address')
                 ->default('No Data'),
                 

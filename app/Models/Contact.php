@@ -11,6 +11,7 @@ class Contact extends Model
 
     protected $casts = [
         'contact_no' => 'array',
+        // 'contact_person' => 'array',
     ];
 
     protected $fillable = [

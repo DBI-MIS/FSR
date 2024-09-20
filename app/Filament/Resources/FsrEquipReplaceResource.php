@@ -11,11 +11,13 @@ use Filament\Forms;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\GlobalSearch\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class FsrEquipReplaceResource extends Resource
@@ -34,6 +36,14 @@ class FsrEquipReplaceResource extends Resource
     protected static ?string $navigationGroup = 'Equipments';
 
     protected static ?string $label = 'Replacement';
+
+    public static function getGlobalSearchResultActions(Model $record): array
+    {
+        return [
+            Action::make('edit')
+                ->url(static::getUrl('edit', ['record' => $record])),
+        ];
+    }
 
     // protected static bool $shouldRegisterNavigation = false;
 

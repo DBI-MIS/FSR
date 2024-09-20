@@ -22,9 +22,9 @@ class FsrsRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('fsr_no')
-                    ->required()
-                    ->maxLength(255),
+                // Forms\Components\TextInput::make('fsr_no')
+                //     ->required()
+                //     ->maxLength(255),
             ]);
     }
 
@@ -39,8 +39,14 @@ class FsrsRelationManager extends RelationManager
             ->filters([
                 //
             ])
+            // ->inverseRelationship('equipments')
             ->headerActions([
-                // Tables\Actions\AttachAction::make(),
+                Tables\Actions\AttachAction::make()
+                ->preloadRecordSelect()
+                ->form(fn (AttachAction $action): array => [
+                    $action->getRecordSelect(),
+                    Forms\Components\TextInput::make('fsr_equipments')->required(),
+                ]),
                 // Tables\Actions\AssociateAction::make(),
                 // Tables\Actions\CreateAction::make(),
             ])

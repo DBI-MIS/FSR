@@ -33,6 +33,7 @@ use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\GlobalSearch\Actions\Action;
 use Filament\Infolists\Components\Component;
 use Filament\Infolists\Components\Section as ComponentsSection;
 use Filament\Infolists\Components\Split as ComponentsSplit;
@@ -72,6 +73,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Filters\QueryBuilder\Constraints\NumberConstraint;
 use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Parallax\FilamentComments\Infolists\Components\CommentsEntry;
@@ -101,6 +103,33 @@ class FsrResource extends Resource
 
     use CreateRecord\Concerns\HasWizard;
 
+    protected static ?string $recordTitleAttribute = 'fsr_no';
+
+    public static function getGloballySearchableAttributes(): array
+{
+    return ['fsr_no', 'project.name',];
+}
+
+public static function getGlobalSearchResultDetails(Model $record): array
+{
+    return [
+        'FSR No.' => $record->fsr_no,
+        'Project' => $record->project->name,
+    ];
+}
+
+public static function getGlobalSearchResultUrl(Model $record): string
+{
+    return FsrResource::getUrl('view', ['record' => $record]);
+}
+
+public static function getGlobalSearchResultActions(Model $record): array
+{
+    return [
+        Action::make('edit')
+            ->url(static::getUrl('edit', ['record' => $record])),
+    ];
+}
 
 
     public static function form(Form $form): Form

@@ -15,11 +15,13 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\GlobalSearch\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class EquipmentResource extends Resource
@@ -38,6 +40,35 @@ class EquipmentResource extends Resource
 protected static ?string $navigationGroup = 'Equipments';
 
 protected static ?string $label = 'Equipments';
+
+protected static ?string $recordTitleAttribute = 'model';
+
+public static function getGloballySearchableAttributes(): array
+{
+    return ['model', 'serial',];
+}
+
+public static function getGlobalSearchResultDetails(Model $record): array
+{
+    return [
+        'Brand' => $record->brand,
+        'Model' => $record->model,
+        'Serial' => $record->serial,
+    ];
+}
+
+// public static function getGlobalSearchResultUrl(Model $record): string
+// {
+//     return EquipmentResource::getUrl('view', ['record' => $record]);
+// }
+
+public static function getGlobalSearchResultActions(Model $record): array
+{
+    return [
+        Action::make('edit')
+            ->url(static::getUrl('edit', ['record' => $record])),
+    ];
+}
 
     public static function form(Form $form): Form
     {

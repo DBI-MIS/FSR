@@ -105,6 +105,7 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
+            ->globalSearchDebounce('750ms')
             ->plugins([
                 FilamentGeneralSettingsPlugin::make()
                     ->canAccess(fn() => User::find(1)->isAdmin())
@@ -114,17 +115,14 @@ class AdminPanelProvider extends PanelProvider
                     ->setTitle('General Settings')
                     ->setNavigationLabel('General Settings'),
                 FilamentGazePlugin::make(),
-                GlobalSearchModalPlugin::make()
-
-    
-
+                // GlobalSearchModalPlugin::make()
+                // ->closeByEscaping(enabled: false)
+                // ->closeByClickingAway(enabled: false)
+                // ->closeButton(enabled: true)
+                // ->associateItemsWithTheirGroups()
+                // ->SwappableOnMobile(enabled: false)
+                // ->RetainRecentIfFavorite(true)
             ])
-
-            // ->renderHook(
-            //    'widgets::table-widget.start',
-            //     fn (array $scopes): View => view('filament.loader-widget', ['scopes' => $scopes]),
-            //     scopes: \Livewire\Livewire::current(),
-            // )
             ->navigationGroups([
 
                 NavigationGroup::make('FSR')

@@ -13,12 +13,14 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
+use Filament\GlobalSearch\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
@@ -40,6 +42,31 @@ class DbePersonnelResource extends Resource
 
     protected static ?string $label = 'DBE Personnel';
 
+    protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'designation',];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Name' => $record->name,
+            'Designation' => $record->designation,
+            'Status' => $record->employee_status,
+        ];
+    }
+
+public static function getGlobalSearchResultActions(Model $record): array
+{
+    return [
+        Action::make('edit')
+            ->url(static::getUrl('edit', ['record' => $record])),
+    ];
+}
+    
+
     public static function form(Form $form): Form
     {
         return $form
@@ -48,10 +75,10 @@ class DbePersonnelResource extends Resource
                     ->description(' ')
                     ->schema([
                         GazeBanner::make()
-                ->lock()
-                ->canTakeControl()
-                ->hideOnCreate()
-                ->columnSpanFull(),
+                            ->lock()
+                            ->canTakeControl()
+                            ->hideOnCreate()
+                            ->columnSpanFull(),
                         FileUpload::make('profile_photo_path')
                             ->imageEditor()
                             ->imageEditorMode(2)
@@ -107,7 +134,7 @@ class DbePersonnelResource extends Resource
             ->deferLoading()
             ->defaultSort('employee_status', 'asc')
             ->columns([
-                
+
                 TextColumn::make('id')
                     ->searchable(),
                 ImageColumn::make('profile_photo_path')
@@ -125,17 +152,17 @@ class DbePersonnelResource extends Resource
                     ->searchable()
                     ->default('No Data'),
                 TextColumn::make('employee_status')
-                ->badge()
+                    ->badge()
                     ->label('Status')
                     ->searchable()
                     ->default('No Data')
                     ->sortable()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'Active' => 'success',
                         'Inactive' => 'info',
                         'Resigned' => 'warning',
                         'No Data' => 'info',
-                        }),
+                    }),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

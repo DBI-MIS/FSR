@@ -20,6 +20,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
+use Filament\GlobalSearch\Actions\Action;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\View;
 use Filament\Infolists\Infolist;
@@ -36,6 +37,7 @@ use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Support\Facades\Log;
 use Filament\Tables\Filters\Filter;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class DbeDirectoryResource extends Resource
@@ -47,6 +49,8 @@ class DbeDirectoryResource extends Resource
     protected static ?string $label = 'Client';
 
     protected static ?int $navigationSort = 1;
+
+    protected static ?string $recordTitleAttribute = 'directoryproject.name';
 
     public static function getGloballySearchableAttributes(): array
     {
@@ -64,6 +68,22 @@ class DbeDirectoryResource extends Resource
         return parent::getGlobalSearchEloquentQuery()->with(['contactsdbe', 'directoryproject']);
     }
 
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        $contacts = $record->contactsdbe;
+    
+        $contactPersons = [];
+
+        foreach ($contacts as $contact) {
+            $contactPersons[] = $contact['contact_person'];
+        }
+    
+        return [
+            'Project' => $record->directoryproject->name,
+            'Contact Persons' => !empty($contactPersons) ? implode(', ', $contactPersons) : 'N/A',
+        ];
+    }
+
 
 
 
@@ -73,6 +93,19 @@ class DbeDirectoryResource extends Resource
     }
 
     protected static ?string $navigationGroup = 'Directory';
+
+    public static function getGlobalSearchResultUrl(Model $record): string
+{
+    return DbeDirectoryResource::getUrl('view', ['record' => $record]);
+}
+
+public static function getGlobalSearchResultActions(Model $record): array
+{
+    return [
+        Action::make('edit')
+            ->url(static::getUrl('edit', ['record' => $record])),
+    ];
+}
 
 
     public static function form(Form $form): Form
