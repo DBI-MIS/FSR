@@ -41,12 +41,12 @@ class FsrsRelationManager extends RelationManager
             ])
             // ->inverseRelationship('equipments')
             ->headerActions([
-                Tables\Actions\AttachAction::make()
-                ->preloadRecordSelect()
-                ->form(fn (AttachAction $action): array => [
-                    $action->getRecordSelect(),
-                    Forms\Components\TextInput::make('fsr_equipments')->required(),
-                ]),
+                // Tables\Actions\AttachAction::make()
+                // ->preloadRecordSelect()
+                // ->form(fn (AttachAction $action): array => [
+                //     $action->getRecordSelect(),
+                //     Forms\Components\TextInput::make('fsr_equipments')->required(),
+                // ]),
                 // Tables\Actions\AssociateAction::make(),
                 // Tables\Actions\CreateAction::make(),
             ])
