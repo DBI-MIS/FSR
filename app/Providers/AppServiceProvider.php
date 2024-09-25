@@ -49,12 +49,12 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
 
-        FilamentView::registerRenderHook(
-            PanelsRenderHook::PAGE_START,
-            fn (array $scopes): View => view('filament.loader', ['scopes' => $scopes]),
-            // scopes: \App\Filament\Resources\DbeDirectoryResource::class,
-            scopes: \Livewire\Livewire::current(),
-            );
+        // FilamentView::registerRenderHook(
+        //     PanelsRenderHook::PAGE_START,
+        //     fn (array $scopes): View => view('filament.loader', ['scopes' => $scopes]),
+        //     // scopes: \App\Filament\Resources\DbeDirectoryResource::class,
+        //     scopes: \Livewire\Livewire::current(),
+        //     );
 
     
              // FilamentView::registerRenderHook(

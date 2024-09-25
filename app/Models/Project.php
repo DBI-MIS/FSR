@@ -53,6 +53,10 @@ class Project extends Model
         return $this->hasOne(DbeDirectory::class, 'project_id');
     }
 
+    public function pmsubcriptions()
+    {
+        return $this->hasMany(Pmservice::class, 'project_id');
+    }
 
 
     // public function equipments()
