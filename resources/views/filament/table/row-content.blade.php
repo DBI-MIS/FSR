@@ -57,7 +57,7 @@
 
 
 </div>
-<x-filament-tables::columns.layout :components="$getComponents()" :record="$getRecord()" :record-key="$recordKey" />
+<x-filament-tables::columns.layout :components="$getComponents()" :record="$getRecord()" :record-key="$recordKey"/>
 <div class="border-t-2 flex justify-end">
    
     <p class="text-slate-400">

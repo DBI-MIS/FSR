@@ -24,12 +24,12 @@ class ListPmservices extends ListRecords
         ];
     }
 
-    protected function getHeaderWidgets(): array
-    {
-        return [
-            PmservicesWidget::class,
-        ];
-    }
+    // protected function getHeaderWidgets(): array
+    // {
+    //     return [
+    //         PmservicesWidget::class,
+    //     ];
+    // }
 
   
 }

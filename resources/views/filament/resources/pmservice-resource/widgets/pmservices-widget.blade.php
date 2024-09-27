@@ -36,7 +36,8 @@
                             <td>{{ $service->subscription }}</td>
                             {{-- <td>{{ $service->start_date }} to {{ $service->end_date }} </td> --}}
                             <td>
-                                {{ \Carbon\Carbon::parse($service->start_date)->format('m-d-Y') }} <span class="text-xs">to</span> {{ \Carbon\Carbon::parse($service->end_date)->format('m-d-Y') }}
+                                {{ \Carbon\Carbon::parse($service->start_date)->format('m-d-Y') }} <span class="text-xs">to</span> {{ $service->end_date ? \Carbon\Carbon::parse($service->end_date)->format('m-d-Y') : 'Continuous' }}
+
                             </td>
                             
 

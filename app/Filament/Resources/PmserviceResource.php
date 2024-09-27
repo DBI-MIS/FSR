@@ -27,6 +27,10 @@ use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Grouping\Group;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\HtmlString;
+use Filament\Tables\Columns\Layout\View as LayoutView;
+use Filament\Tables\Columns\ViewColumn;
 
 use function Laravel\Prompts\form;
 
@@ -66,6 +70,7 @@ class PmserviceResource extends Resource
                                 'new' => 'New',
                                 'renewal' => 'Renewal',
                             ])
+                            ->hint(new HtmlString(Blade::render('<x-filament::loading-indicator class="h-5 w-5" wire:loading wire:target="data.contract_type" />')))
                             ->live(),
 
                         Select::make('status')
@@ -75,6 +80,7 @@ class PmserviceResource extends Resource
                                 'inactive' => 'inactive',
                                 'cancelled' => 'cancelled',
                             ])
+                            ->hint(new HtmlString(Blade::render('<x-filament::loading-indicator class="h-5 w-5" wire:loading wire:target="data.status" />')))
                             ->live(),
 
 
@@ -102,6 +108,8 @@ class PmserviceResource extends Resource
                                 'Continuous' => 'Continuous',
                             ])
                             ->live()
+                            ->hint(new HtmlString(Blade::render('<x-filament::loading-indicator class="h-5 w-5" wire:loading wire:target="data.contract_duration" />')))
+                            
                             ->afterStateUpdated(function ($state, $set) {
                                 if ($state === 'Continuous') {
                                     $set('subscription', 'continuous');
@@ -110,12 +118,13 @@ class PmserviceResource extends Resource
 
                         DatePicker::make('start_date')
                             ->label('Start Date')
-                            ->default(Carbon::now())
+                            // ->default(Carbon::now())
                             ->columnSpan(1)
                             ->native(false)
                             ->hidden(
                                 fn($get) => $get('contract_type') === 'renewal'
                             )
+                            ->hint(new HtmlString(Blade::render('<x-filament::loading-indicator class="h-5 w-5" wire:loading wire:target="data.start_date" />')))
                             ->live()
                             ->afterStateUpdated(function ($state, $set, $get) {
                                 $startDate = $get('start_date');
@@ -148,26 +157,57 @@ class PmserviceResource extends Resource
 
 
                         Select::make('subscription')
-                            ->options([
-                                'bimonthly' => 'bimonthly',
-                                'monthly' => 'monthly',
-                                'quarterly' => 'quarterly',
-                                'semi-annual' => 'semi-annual',
-                                'annual' => 'annual',
-                                'continuous' => 'continuous',
-                            ])
                             ->live()
+                            ->options(fn(Get $get): array => match ($get('contract_duration')) {
+                                '1 Year' => [
+                                    'bimonthly' => 'bimonthly',
+                                    'monthly' => 'monthly',
+                                    'quarterly' => 'quarterly',
+                                    'semi-annual' => 'semi-annual',
+                                    'annual' => 'annual',
+                                ],
+                                '2 Years' => [
+                                    'bimonthly' => 'bimonthly',
+                                    'monthly' => 'monthly',
+                                    'quarterly' => 'quarterly',
+                                    'semi-annual' => 'semi-annual',
+                                    'annual' => 'annual',
+                                ],
+                                '3 Years' => [
+                                    'bimonthly' => 'bimonthly',
+                                    'monthly' => 'monthly',
+                                    'quarterly' => 'quarterly',
+                                    'semi-annual' => 'semi-annual',
+                                    'annual' => 'annual',
+                                ],
+                                'Continuous' => [
+                                    'continuous' => 'continuous'
+                                ],
+                                default => [],
+                            })
+
+                            ->hint(new HtmlString(Blade::render('<x-filament::loading-indicator class="h-5 w-5" wire:loading wire:target="data.subscription" />')))
                             ->afterStateUpdated(function ($state, $set) {
-                                // Check if $state is valid before setting date_slots
-                                if (in_array($state, ['bimonthly', 'monthly', 'quarterly', 'semi-annual', 'annual', 'continuous'])) {
-                                    // Set date_slots as an array for Builder to handle
+                                $validStates = [
+                                    ['bimonthly' => 'bimonthly'],
+                                    ['monthly' => 'monthly'],
+                                    ['quarterly' => 'quarterly'],
+                                    ['semi-annual' => 'semi-annual'],
+                                    ['annual' => 'annual'],
+                                    ['continuous' => 'continuous'],
+                                ];
+                        
+                                $validStateValues = array_map(fn($option) => array_values($option)[0], $validStates); // Extract the values from nested arrays
+                        
+                                if (in_array($state, $validStateValues)) {
                                     $set('date_slots', [['type' => strtoupper($state)]]);
                                 } else {
-                                    // Optionally clear date_slots if an invalid state is selected
                                     $set('date_slots', []);
                                 }
                             }),
+                            
                         DatePicker::make('end_date')
+                            ->nullable()
                             ->label('End Date')
                             ->native(false)
                             ->displayFormat('Y/m/d'),
@@ -212,6 +252,7 @@ class PmserviceResource extends Resource
 
                         Builder::make('date_slots')
                             ->label('Preventive Maintenance Subscription')
+                            ->hint(new HtmlString(Blade::render('<x-filament::loading-indicator class="h-5 w-5" wire:loading wire:target="data.subscription" />')))
                             ->live()
                             ->afterStateUpdated(function ($get, $set) {
                                 $dateSlots = $get('date_slots');
@@ -235,7 +276,7 @@ class PmserviceResource extends Resource
                                         case 'ANNUAL':
                                             $set('subscription', 'annual');
                                             break;
-                                        case 'CUNTIONUOUS':
+                                        case 'CONTINUOUS':
                                             $set('subscription', 'continuous');
                                             break;
                                         default:
@@ -523,9 +564,9 @@ class PmserviceResource extends Resource
                             ->columnSpanFull()
                             ->blockPickerColumns(2)
                             ->minItems(1)
-                            ->maxItems(function ($state, $get) {
+                            ->maxItems(function ($get) {
                                 $subscription = $get('subscription');
-                                return $subscription === 'continuous' ? null : 1;
+                                return $subscription === 'continuous' ? PHP_INT_MAX : 1;
                             })
                             ->blockNumbers(false)
                             ->reorderable(false)
@@ -543,65 +584,100 @@ class PmserviceResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->groups([
-                Group::make('subscription')
-                    ->label('Subscription'),
-                Group::make('contract_duration')
-                    ->label('Contract'),
-            ])
-            ->defaultGroup('subscription')
+            // ->groups([
+            //     Group::make('subscription')
+            //         ->label('Subscription'),
+            //     Group::make('contract_duration')
+            //         ->label('Contract'),
+            // ])
+            // ->defaultGroup('subscription')
+            ->heading('PM List')
+            // ->description('Click the funnel to filter the list.')
+            ->defaultPaginationPageOption(25)
+            ->deferLoading()
+            ->recordUrl(null)
+            ->striped()
             ->columns([
                 TextColumn::make('pm_project.name')
                     ->label('Project/Client')
                     ->sortable(),
                 TextColumn::make('contract_type')
-                    ->label('Contract')
+                    ->label('Type')
                     ->searchable()
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'new' => 'success',
                         'renewal' => 'warning',
                     }),
-                TextColumn::make('contract_duration')
-                    ->label('Contract Period')
+                    TextColumn::make('contract_duration')
+                    ->label('Period')
                     ->searchable(),
-                TextColumn::make('subscription')
-                    ->label('PM Frequency')
-                    ->searchable(),
-                SelectColumn::make('status')
-                    ->options([
-                        'active' => 'active',
-                        'inactive' => 'inactive',
-                        'cancelled' => 'cancelled',
-                    ])
-                    ->afterStateUpdated(function ($record, $state) {
-                        if ($state === 'active') {
-                            $record->status = 'active';
-                        } elseif ($state === 'inactive') {
-                            $record->status = 'inactive';
-                        } elseif ($state === 'cancelled') {
-                            $record->status = 'cancelled';
-                        }
-
-                        $record->save();
+                    TextColumn::make('subscription')
+                    ->label('Frequency')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                                    'bimonthly' => 'success',
+                                    'monthly' => 'success',
+                                    'quarterly' => 'warning',
+                                    'semi-annual' => 'warning',
+                                    'annual' => 'warning',
+                                    'continuous' => 'danger',
                     })
-                    ->selectablePlaceholder(false),
-                TextColumn::make('start_date')
-                    ->date()
-                    ->sortable(),
-                TextColumn::make('end_date')
-                    ->date()
-                    ->sortable(),
-                TextColumn::make('renewal_date')
-                    ->date()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->searchable(),
+                    ViewColumn::make('dates_slots')->view('filament.table.pm-row-content')
+                    ->label('PM Served'),
+                // LayoutView::make('filament.table.pm-row-content'),
+                // TextColumn::make('pm_project.name')
+                //     ->label('Project/Client')
+                //     ->sortable(),
+                // TextColumn::make('contract_type')
+                //     ->label('Contract')
+                //     ->searchable()
+                //     ->badge()
+                //     ->color(fn(string $state): string => match ($state) {
+                //         'new' => 'success',
+                //         'renewal' => 'warning',
+                //     }),
+                // TextColumn::make('contract_duration')
+                //     ->label('Contract Period')
+                //     ->searchable(),
+                // TextColumn::make('subscription')
+                //     ->label('PM Frequency')
+                //     ->searchable(),
+                // SelectColumn::make('status')
+                //     ->options([
+                //         'active' => 'active',
+                //         'inactive' => 'inactive',
+                //         'cancelled' => 'cancelled',
+                //     ])
+                //     ->afterStateUpdated(function ($record, $state) {
+                //         if ($state === 'active') {
+                //             $record->status = 'active';
+                //         } elseif ($state === 'inactive') {
+                //             $record->status = 'inactive';
+                //         } elseif ($state === 'cancelled') {
+                //             $record->status = 'cancelled';
+                //         }
+
+                //         $record->save();
+                //     })
+                //     ->selectablePlaceholder(false),
+                // TextColumn::make('start_date')
+                //     ->date()
+                //     ->sortable(),
+                // TextColumn::make('end_date')
+                //     ->date()
+                //     ->sortable(),
+                // TextColumn::make('renewal_date')
+                //     ->date()
+                //     ->sortable()
+                //     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->label('Update'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
