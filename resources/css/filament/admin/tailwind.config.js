@@ -11,6 +11,7 @@ export default {
         './resources/views/filament/daily-kanban/*.blade.php',
         './resources/views/filament/widgets/*.blade.php',
         './resources/views/filament/*.blade.php',
+        './resources/views/filament/resources/pm-resource/widgets/*.blade.php',
         './resources/**/*.blade.php',
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',

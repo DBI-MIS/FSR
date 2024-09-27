@@ -23,6 +23,9 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Tables\Columns\SelectColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 
 use function Laravel\Prompts\form;
 
@@ -131,10 +134,7 @@ class PmserviceResource extends Resource
                                 fn($get) => $get('contract_type') === 'renewal'
                             ),
 
-                            DatePicker::make('end_date')
-                            ->native(false)
-                            ->displayFormat('Y/m/d')
-                            ->disabled(),
+                           
                             
 
                             Select::make('subscription')
@@ -145,9 +145,11 @@ class PmserviceResource extends Resource
                                 'semi-annual' => 'semi-annual',
                                 'annual' => 'annual',
                                 'custom' => 'custom',
-                            ])
-                            ->default('Select Subscription on the right panel')
-                            ->disabled(),
+                            ]),
+                            DatePicker::make('end_date')
+                            ->label('End Date')
+                            ->native(false)
+                            ->displayFormat('Y/m/d'),
 
                             TextInput::make('free_tc')
                             ->label('Free Trouble Call')
@@ -511,10 +513,11 @@ class PmserviceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('pm_project.name')
+                TextColumn::make('pm_project.name')
                     ->label('Project/Client')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('contract_type')
+                TextColumn::make('contract_type')
+                ->label('Contract')
                     ->searchable()
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -522,23 +525,40 @@ class PmserviceResource extends Resource
                         'renewal' => 'warning',
                         
                     }),
-                Tables\Columns\TextColumn::make('contract_duration')
+                TextColumn::make('contract_duration')
                     ->label('Contract Period')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('subscription')
-                    ->label('Freq')
+                TextColumn::make('subscription')
+                    ->label('PM Frequency')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('start_date')
+                SelectColumn::make('status')
+                ->options([
+                    'active' => 'active',
+                    'inactive' => 'inactive',
+                    'cancelled' => 'cancelled',
+                ])
+                ->afterStateUpdated(function ($record, $state) {
+                    if ($state === 'active') {
+                        $record->status = 'active';
+                    } elseif ($state === 'inactive') {
+                        $record->status = 'inactive';
+                    } elseif ($state === 'cancelled') {
+                        $record->status = 'cancelled';
+                    }
+                    
+                    $record->save();
+                })
+                ->selectablePlaceholder(false),
+                TextColumn::make('start_date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('end_date')
+                TextColumn::make('end_date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('renewal_date')
+                TextColumn::make('renewal_date')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
