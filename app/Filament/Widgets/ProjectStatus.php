@@ -10,7 +10,7 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 class ProjectStatus extends BaseWidget
 {
 
-    protected static ?string $pollingInterval = '15s';
+    // protected static ?string $pollingInterval = '15s';
 
     protected static ?int $sort = 3;
 
