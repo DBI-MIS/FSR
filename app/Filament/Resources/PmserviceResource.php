@@ -5,7 +5,9 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PmserviceResource\Pages;
 use App\Filament\Resources\PmserviceResource\RelationManagers;
 use App\Models\Pmservice;
+use App\Models\Project;
 use Carbon\Carbon;
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Textarea;
@@ -31,6 +33,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Filament\Tables\Columns\Layout\View as LayoutView;
 use Filament\Tables\Columns\ViewColumn;
+use Illuminate\Validation\Rule;
 
 use function Laravel\Prompts\form;
 
@@ -62,7 +65,18 @@ class PmserviceResource extends Resource
                         Select::make('project_id')
                             ->relationship('pm_project', 'name')
                             ->searchable()
-                            ->label('Project/Client'),
+                            ->label('Project/Client')
+                            ->rules([
+                                fn (Get $get): Closure => function (string $attribute, $value, Closure $fail) use ($get) {
+                                    if ($value) {
+                                        $pmservice = Pmservice::where('project_id', $value)->first();
+                                        
+                                        if ($pmservice && $pmservice->end_date >= now()) {
+                                            $fail("Already have a contract.");
+                                        }
+                                    }
+                                },
+                            ]),
                         Select::make('contract_type')
                             ->default('new')
                             ->label('Contract')
@@ -210,6 +224,7 @@ class PmserviceResource extends Resource
                             ->nullable()
                             ->label('End Date')
                             ->native(false)
+                            ->after('start_date')
                             ->displayFormat('Y/m/d'),
 
                         TextInput::make('free_tc')
