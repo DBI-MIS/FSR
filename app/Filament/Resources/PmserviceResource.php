@@ -26,6 +26,7 @@ use Filament\Forms\Set;
 use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Grouping\Group;
 
 use function Laravel\Prompts\form;
 
@@ -54,10 +55,10 @@ class PmserviceResource extends Resource
                 Section::make('Project')
                     ->description(' ')
                     ->schema([
-                    Select::make('project_id')
-                        ->relationship('pm_project', 'name')
-                        ->searchable()
-                        ->label('Project/Client'),
+                        Select::make('project_id')
+                            ->relationship('pm_project', 'name')
+                            ->searchable()
+                            ->label('Project/Client'),
                         Select::make('contract_type')
                             ->default('new')
                             ->label('Contract')
@@ -66,7 +67,7 @@ class PmserviceResource extends Resource
                                 'renewal' => 'Renewal',
                             ])
                             ->live(),
-                      
+
                         Select::make('status')
                             ->default('active')
                             ->options([
@@ -77,7 +78,7 @@ class PmserviceResource extends Resource
                             ->live(),
 
 
-                       
+
                         TextInput::make('po_ref')
                             ->label('P.O. Reference')
                             ->nullable(),
@@ -90,16 +91,22 @@ class PmserviceResource extends Resource
                 Section::make('PM Schedule')
                     ->description(' ')
                     ->schema([
-                      
-                            Select::make('contract_duration')
+
+                        Select::make('contract_duration')
                             ->default('1 Year')
                             ->label('Contract Period')
                             ->options([
                                 '1 Year' => '1 Year',
                                 '2 Years' => '2 Years',
                                 '3 Years' => '3 Years',
+                                'Continuous' => 'Continuous',
                             ])
-                            ->live(),
+                            ->live()
+                            ->afterStateUpdated(function ($state, $set) {
+                                if ($state === 'Continuous') {
+                                    $set('subscription', 'continuous');
+                                }
+                            }),
 
                         DatePicker::make('start_date')
                             ->label('Start Date')
@@ -113,19 +120,22 @@ class PmserviceResource extends Resource
                             ->afterStateUpdated(function ($state, $set, $get) {
                                 $startDate = $get('start_date');
                                 $contractDuration = $get('contract_duration');
-                        
+
                                 if ($startDate && $contractDuration) {
-                                    $years = (int) filter_var($contractDuration, FILTER_SANITIZE_NUMBER_INT);
-                                    $endDate = \Carbon\Carbon::parse($startDate)->addYears($years)->format('Y/m/d');
-                        
-                                    $set('end_date', $endDate);
+                                    if ($contractDuration === 'Continuous') {
+                                        $set('end_date', null);
+                                    } else {
+                                        $years = (int) filter_var($contractDuration, FILTER_SANITIZE_NUMBER_INT);
+                                        $endDate = \Carbon\Carbon::parse($startDate)->addYears($years)->format('Y/m/d');
+                                        $set('end_date', $endDate);
+                                    }
                                 } else {
                                     $set('end_date', null);
                                 }
                             }),
-                            
-                               
-                        
+
+
+
                         DatePicker::make('renewal_date')
                             ->label('Renewal Date')
                             ->native(false)
@@ -134,24 +144,35 @@ class PmserviceResource extends Resource
                                 fn($get) => $get('contract_type') === 'renewal'
                             ),
 
-                           
-                            
 
-                            Select::make('subscription')
+
+
+                        Select::make('subscription')
                             ->options([
                                 'bimonthly' => 'bimonthly',
                                 'monthly' => 'monthly',
                                 'quarterly' => 'quarterly',
                                 'semi-annual' => 'semi-annual',
                                 'annual' => 'annual',
-                                'custom' => 'custom',
-                            ]),
-                            DatePicker::make('end_date')
+                                'continuous' => 'continuous',
+                            ])
+                            ->live()
+                            ->afterStateUpdated(function ($state, $set) {
+                                // Check if $state is valid before setting date_slots
+                                if (in_array($state, ['bimonthly', 'monthly', 'quarterly', 'semi-annual', 'annual', 'continuous'])) {
+                                    // Set date_slots as an array for Builder to handle
+                                    $set('date_slots', [['type' => strtoupper($state)]]);
+                                } else {
+                                    // Optionally clear date_slots if an invalid state is selected
+                                    $set('date_slots', []);
+                                }
+                            }),
+                        DatePicker::make('end_date')
                             ->label('End Date')
                             ->native(false)
                             ->displayFormat('Y/m/d'),
 
-                            TextInput::make('free_tc')
+                        TextInput::make('free_tc')
                             ->label('Free Trouble Call')
                             ->required()
                             ->numeric()
@@ -214,15 +235,15 @@ class PmserviceResource extends Resource
                                         case 'ANNUAL':
                                             $set('subscription', 'annual');
                                             break;
-                                        case 'CUSTOM':
-                                            $set('subscription', 'monthly');
+                                        case 'CUNTIONUOUS':
+                                            $set('subscription', 'continuous');
                                             break;
                                         default:
-                                            $set('subscription', 'Select Subscription on the right panel');
+                                            $set('subscription', null);
                                             break;
                                     }
                                 } else {
-                                    $set('subscription', 'Select Subscription on the right panel');
+                                    $set('subscription', null);
                                 }
                             })
 
@@ -491,14 +512,24 @@ class PmserviceResource extends Resource
                                             ->label('Date')
                                             ->columnSpanFull(),
                                     ]),
+                                Builder\Block::make('CONTINUOUS')
+                                    ->label(__('Continuous'))
+                                    ->schema([
+                                        DatePicker::make('date_slot_01')
+                                            ->label('Date')
+                                            ->columnSpanFull(),
+                                    ]),
                             ])
                             ->columnSpanFull()
                             ->blockPickerColumns(2)
                             ->minItems(1)
-                            ->maxItems(1)
+                            ->maxItems(function ($state, $get) {
+                                $subscription = $get('subscription');
+                                return $subscription === 'continuous' ? null : 1;
+                            })
                             ->blockNumbers(false)
                             ->reorderable(false)
-                            ->addActionLabel('Add Subscription')
+                            ->addActionLabel('Add')
                             ->deletable(fn(string $operation): bool => $operation !== 'edit' || auth()->user()->role === 'ADMIN'),
 
                     ])
@@ -512,18 +543,24 @@ class PmserviceResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->groups([
+                Group::make('subscription')
+                    ->label('Subscription'),
+                Group::make('contract_duration')
+                    ->label('Contract'),
+            ])
+            ->defaultGroup('subscription')
             ->columns([
                 TextColumn::make('pm_project.name')
                     ->label('Project/Client')
                     ->sortable(),
                 TextColumn::make('contract_type')
-                ->label('Contract')
+                    ->label('Contract')
                     ->searchable()
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'new' => 'success',
                         'renewal' => 'warning',
-                        
                     }),
                 TextColumn::make('contract_duration')
                     ->label('Contract Period')
@@ -532,23 +569,23 @@ class PmserviceResource extends Resource
                     ->label('PM Frequency')
                     ->searchable(),
                 SelectColumn::make('status')
-                ->options([
-                    'active' => 'active',
-                    'inactive' => 'inactive',
-                    'cancelled' => 'cancelled',
-                ])
-                ->afterStateUpdated(function ($record, $state) {
-                    if ($state === 'active') {
-                        $record->status = 'active';
-                    } elseif ($state === 'inactive') {
-                        $record->status = 'inactive';
-                    } elseif ($state === 'cancelled') {
-                        $record->status = 'cancelled';
-                    }
-                    
-                    $record->save();
-                })
-                ->selectablePlaceholder(false),
+                    ->options([
+                        'active' => 'active',
+                        'inactive' => 'inactive',
+                        'cancelled' => 'cancelled',
+                    ])
+                    ->afterStateUpdated(function ($record, $state) {
+                        if ($state === 'active') {
+                            $record->status = 'active';
+                        } elseif ($state === 'inactive') {
+                            $record->status = 'inactive';
+                        } elseif ($state === 'cancelled') {
+                            $record->status = 'cancelled';
+                        }
+
+                        $record->save();
+                    })
+                    ->selectablePlaceholder(false),
                 TextColumn::make('start_date')
                     ->date()
                     ->sortable(),

@@ -54,7 +54,7 @@
                                 @if ($slot['type'] === 'BIMONTHLY')
                                     @foreach ($slot['data'] as $key => $date)
                                         <td colspan="1">
-                                            <abbr title="{{ $date }}">
+                                            <abbr title="{{ $date ? 'Served: '.$date : 'Not yet served.' }}">
                                             <div class="{{ $date ? 'bg-blue-500' : 'bg-gray-300' }} h-5"
                                                 style="width: 100%;"></div>
                                             </abbr>
@@ -65,7 +65,7 @@
                                 @if ($slot['type'] === 'MONTHLY')
                                 @foreach ($slot['data'] as $key => $date)
                                     <td colspan="2">
-                                        <abbr title="{{ $date }}">
+                                        <abbr title="{{ $date ? 'Served: '.$date : 'Not yet served.' }}">
                                         <div class="{{ $date ? 'bg-blue-500' : 'bg-gray-300' }} h-5"
                                             style="width: 100%;"></div>
                                         </abbr>
@@ -76,7 +76,7 @@
                                 @if ($slot['type'] === 'QUARTERLY')
                                 @foreach ($slot['data'] as $key => $date)
                                     <td colspan="6">
-                                        <abbr title="{{ $date }}">
+                                        <abbr title="{{ $date ? 'Served: '.$date : 'Not yet served.' }}">
                                         <div class="{{ $date ? 'bg-blue-500' : 'bg-gray-300' }} h-5"
                                             style="width: 100%;"></div>
                                         </abbr>
@@ -87,7 +87,7 @@
                                 @if ($slot['type'] === 'SEMI-ANNUAL')
                                 @foreach ($slot['data'] as $key => $date)
                                     <td colspan="12">
-                                        <abbr title="{{ $date }}">
+                                        <abbr title="{{ $date ? 'Served: '.$date : 'Not yet served.' }}">
                                         <div class="{{ $date ? 'bg-blue-500' : 'bg-gray-300' }} h-5"
                                             style="width: 100%;"></div>
                                         </abbr>
@@ -98,7 +98,7 @@
                                 @if ($slot['type'] === 'ANNUAL')
                                 @foreach ($slot['data'] as $key => $date)
                                     <td colspan="24">
-                                        <abbr title="{{ $date }}">
+                                        <abbr title="{{ $date ? 'Served: '.$date : 'Not yet served.' }}">
                                         <div class="{{ $date ? 'bg-blue-500' : 'bg-gray-300' }} h-5"
                                             style="width: 100%;"></div>
                                         </abbr>
