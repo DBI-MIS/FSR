@@ -584,13 +584,13 @@ class PmserviceResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            // ->groups([
-            //     Group::make('subscription')
-            //         ->label('Subscription'),
-            //     Group::make('contract_duration')
-            //         ->label('Contract'),
-            // ])
-            // ->defaultGroup('subscription')
+            ->groups([
+                Group::make('subscription')
+                    ->label('Subscription'),
+                Group::make('contract_duration')
+                    ->label('Contract'),
+            ])
+            ->defaultGroup('subscription')
             ->heading('PM List')
             // ->description('Click the funnel to filter the list.')
             ->defaultPaginationPageOption(25)
@@ -662,22 +662,24 @@ class PmserviceResource extends Resource
                 //         $record->save();
                 //     })
                 //     ->selectablePlaceholder(false),
-                // TextColumn::make('start_date')
-                //     ->date()
-                //     ->sortable(),
-                // TextColumn::make('end_date')
-                //     ->date()
-                //     ->sortable(),
-                // TextColumn::make('renewal_date')
-                //     ->date()
-                //     ->sortable()
-                //     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('start_date')
+                    ->date()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('end_date')
+                    ->date()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('renewal_date')
+                    ->date()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make()->label('Update'),
+                Tables\Actions\EditAction::make()->label(' '),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
