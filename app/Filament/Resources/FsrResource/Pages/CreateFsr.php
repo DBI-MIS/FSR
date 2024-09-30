@@ -346,19 +346,28 @@ class CreateFsr extends CreateRecord
                             Select::make('reading_for')
                                 ->options([
                                     'Chiller' => 'Chiller',
+                                    'WCP' => 'WCP',
                                     'AHU' => 'AHU',
                                     'FCU' => 'FCU',
+                                    'ACP' => 'ACP',
+                                    'PECISION A/C' => 'PRECISION A/C',
                                 ])
                                 ->label('Select Equipment Type')
                                 ->nullable(),
-                            Select::make('refrigerant_type')
-                                ->options([
-                                    'R410a' => 'R410a',
-                                ])->nullable(),
+                            TextInput::make('refrigerant_type')
+                                // ->options([
+                                //     'R410a' => 'R410a',
+                                // ])
+                                ->nullable(),
 
                             Select::make('compressor_type')
                                 ->options([
-                                    'R410a' => 'R410a',
+                                    'Centrifugal' => 'Centrifugal',
+                                    'Rotary Screw' => 'Rotary Screw',
+                                    'HSC' => 'HSC',
+                                    'VSC' => 'VSC',
+                                    'Oilless Magnetic' => 'Oilless Magnetic',
+                                    'Scroll' => 'Scroll',
                                 ])->nullable()
                         ])->columnSpan(2),
 

@@ -442,22 +442,31 @@ public static function getGlobalSearchResultActions(Model $record): array
                                 ->schema([
 
                                     Select::make('reading_for')
-                                        ->options([
-                                            'Chiller' => 'Chiller',
-                                            'AHU' => 'AHU',
-                                            'FCU' => 'FCU',
-                                        ])
-                                        ->label('Select Equipment Type')
-                                        ->nullable(),
-                                    Select::make('refrigerant_type')
-                                        ->options([
-                                            'R410a' => 'R410a',
-                                        ])->nullable(),
+                                ->options([
+                                    'Chiller' => 'Chiller',
+                                    'WCP' => 'WCP',
+                                    'AHU' => 'AHU',
+                                    'FCU' => 'FCU',
+                                    'ACP' => 'ACP',
+                                    'PECISION A/C' => 'PRECISION A/C',
+                                ])
+                                ->label('Select Equipment Type')
+                                ->nullable(),
+                            TextInput::make('refrigerant_type')
+                                // ->options([
+                                //     'R410a' => 'R410a',
+                                // ])
+                                ->nullable(),
 
-                                    Select::make('compressor_type')
-                                        ->options([
-                                            'R410a' => 'R410a',
-                                        ])->nullable()
+                            Select::make('compressor_type')
+                                ->options([
+                                    'Centrifugal' => 'Centrifugal',
+                                    'Rotary Screw' => 'Rotary Screw',
+                                    'HSC' => 'HSC',
+                                    'VSC' => 'VSC',
+                                    'Oilless Magnetic' => 'Oilless Magnetic',
+                                    'Scroll' => 'Scroll',
+                                ])->nullable()
                                 ])->columnSpan(2),
 
                             Fieldset::make('Log Readings:')
