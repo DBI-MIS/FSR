@@ -23,6 +23,7 @@ use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Tables\Columns\SelectColumn;
@@ -33,6 +34,11 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Filament\Tables\Columns\Layout\View as LayoutView;
 use Filament\Tables\Columns\ViewColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 use function Laravel\Prompts\form;
@@ -66,13 +72,21 @@ class PmserviceResource extends Resource
                             ->relationship('pm_project', 'name')
                             ->searchable()
                             ->label('Project/Client')
+                            // ->unique(ignoreRecord: true),
                             ->rules([
-                                fn (Get $get): Closure => function (string $attribute, $value, Closure $fail) use ($get) {
-                                    if ($value) {
+                                fn(Get $get, string $operation): Closure => function (string $attribute, $value, Closure $fail) use ($get, $operation) {
+
+                                    if ($operation !== 'edit' && $value) {
                                         $pmservice = Pmservice::where('project_id', $value)->first();
-                                        
-                                        if ($pmservice && $pmservice->end_date >= now()) {
-                                            $fail("Already have a contract.");
+
+                                        if ($pmservice) {
+                                            if ($pmservice->end_date >= now()) {
+                                                $fail("Already have a contract.");
+                                            }
+
+                                            if ($pmservice->subscription === 'continuous') {
+                                                $fail("Already have a continuous contract.");
+                                            }
                                         }
                                     }
                                 },
@@ -113,7 +127,6 @@ class PmserviceResource extends Resource
                     ->schema([
 
                         Select::make('contract_duration')
-                            ->default('1 Year')
                             ->label('Contract Period')
                             ->options([
                                 '1 Year' => '1 Year',
@@ -123,10 +136,24 @@ class PmserviceResource extends Resource
                             ])
                             ->live()
                             ->hint(new HtmlString(Blade::render('<x-filament::loading-indicator class="h-5 w-5" wire:loading wire:target="data.contract_duration" />')))
-                            
-                            ->afterStateUpdated(function ($state, $set) {
+                            ->afterStateUpdated(function ($state, $set, $get) {
                                 if ($state === 'Continuous') {
                                     $set('subscription', 'continuous');
+                                }
+
+                                $startDate = $get('start_date') ?? $get('renewal_date');
+                                $contractDuration = $get('contract_duration');
+
+                                if ($startDate && $contractDuration) {
+                                    if ($contractDuration === 'Continuous') {
+                                        $set('end_date', null);
+                                    } else {
+                                        $years = (int) filter_var($contractDuration, FILTER_SANITIZE_NUMBER_INT);
+                                        $endDate = \Carbon\Carbon::parse($startDate)->addYears($years)->format('Y/m/d');
+                                        $set('end_date', $endDate);
+                                    }
+                                } else {
+                                    $set('end_date', null);
                                 }
                             }),
 
@@ -138,6 +165,7 @@ class PmserviceResource extends Resource
                             ->hidden(
                                 fn($get) => $get('contract_type') === 'renewal'
                             )
+                            ->dehydrated()
                             ->hint(new HtmlString(Blade::render('<x-filament::loading-indicator class="h-5 w-5" wire:loading wire:target="data.start_date" />')))
                             ->live()
                             ->afterStateUpdated(function ($state, $set, $get) {
@@ -165,7 +193,25 @@ class PmserviceResource extends Resource
                             ->columnSpan(1)
                             ->visible(
                                 fn($get) => $get('contract_type') === 'renewal'
-                            ),
+                            )
+                            ->hint(new HtmlString(Blade::render('<x-filament::loading-indicator class="h-5 w-5" wire:loading wire:target="data.renewal_date" />')))
+                            ->live()
+                            ->afterStateUpdated(function ($state, $set, $get) {
+                                $startDate = $get('renewal_date');
+                                $contractDuration = $get('contract_duration');
+
+                                if ($startDate && $contractDuration) {
+                                    if ($contractDuration === 'Continuous') {
+                                        $set('end_date', null);
+                                    } else {
+                                        $years = (int) filter_var($contractDuration, FILTER_SANITIZE_NUMBER_INT);
+                                        $endDate = \Carbon\Carbon::parse($startDate)->addYears($years)->format('Y/m/d');
+                                        $set('end_date', $endDate);
+                                    }
+                                } else {
+                                    $set('end_date', null);
+                                }
+                            }),
 
 
 
@@ -210,22 +256,32 @@ class PmserviceResource extends Resource
                                     ['annual' => 'annual'],
                                     ['continuous' => 'continuous'],
                                 ];
-                        
+
                                 $validStateValues = array_map(fn($option) => array_values($option)[0], $validStates); // Extract the values from nested arrays
-                        
+
                                 if (in_array($state, $validStateValues)) {
                                     $set('date_slots', [['type' => strtoupper($state)]]);
                                 } else {
                                     $set('date_slots', []);
                                 }
                             }),
-                            
+
                         DatePicker::make('end_date')
                             ->nullable()
                             ->label('End Date')
                             ->native(false)
-                            ->after('start_date')
-                            ->displayFormat('Y/m/d'),
+                            ->after('start_date'),
+                        // ->dehydrated()
+                        // ->dehydrateStateUsing(function ($state, $get) {
+                        //     $startDate = $get('start_date'); // Retrieve the state of 'start_date'
+                        //     $contractDuration = $get('contract_duration'); // Retrieve the state of 'contract_duration'
+
+                        //     if ($startDate && $contractDuration) {
+                        //         return \Carbon\Carbon::parse($startDate)->addDays($contractDuration);
+                        //     }
+
+                        //     return $state; // Return the existing state if no changes are needed
+                        // }),
 
                         TextInput::make('free_tc')
                             ->label('Free Trouble Call')
@@ -294,18 +350,13 @@ class PmserviceResource extends Resource
                                         case 'CONTINUOUS':
                                             $set('subscription', 'continuous');
                                             break;
-                                        default:
-                                            $set('subscription', null);
-                                            break;
                                     }
-                                } else {
-                                    $set('subscription', null);
                                 }
                             })
 
                             ->blocks([
                                 Builder\Block::make('BIMONTHLY')
-
+                                    ->hidden(fn($get) => $get('../subscription') !== 'bimonthly')
                                     ->label(__('Bi-Monthly'))
                                     ->schema([
                                         Section::make('1st Month')
@@ -313,23 +364,39 @@ class PmserviceResource extends Resource
                                                 DatePicker::make('date_slot_01')
                                                     ->label('Date')
                                                     ->columnSpan(1),
+                                                TextInput::make('note_slot_01')
+                                                    ->label('Note')
+                                                    ->columnSpan(1),
                                                 DatePicker::make('date_slot_01_')
                                                     ->label('Date')
+                                                    ->columnSpan(1),
+                                                TextInput::make('note_slot_01_')
+                                                    ->label('Note')
                                                     ->columnSpan(1),
                                             ])
                                             ->columnSpan(1)
                                             ->compact()
                                             ->collapsible()
                                             ->persistCollapsed()
-                                            ->collapsed(),
+                                            ->collapsed()
+                                        // ->afterStateHydrated(function($get) {
+                                        //     dd($get('./'));
+                                        // })
+                                        ,
 
                                         Section::make('2nd Month')
                                             ->schema([
                                                 DatePicker::make('date_slot_02')
                                                     ->label('Date')
                                                     ->columnSpan(1),
+                                                TextInput::make('note_slot_02')
+                                                    ->label('Note')
+                                                    ->columnSpan(1),
                                                 DatePicker::make('date_slot_02_')
                                                     ->label('Date')
+                                                    ->columnSpan(1),
+                                                TextInput::make('note_slot_02_')
+                                                    ->label('Note')
                                                     ->columnSpan(1),
                                             ])
                                             ->columnSpan(1)
@@ -343,8 +410,14 @@ class PmserviceResource extends Resource
                                                 DatePicker::make('date_slot_03')
                                                     ->label('Date')
                                                     ->columnSpan(1),
+                                                TextInput::make('note_slot_03')
+                                                    ->label('Note')
+                                                    ->columnSpan(1),
                                                 DatePicker::make('date_slot_03_')
                                                     ->label('Date')
+                                                    ->columnSpan(1),
+                                                TextInput::make('note_slot_03_')
+                                                    ->label('Note')
                                                     ->columnSpan(1),
                                             ])
                                             ->columnSpan(1)
@@ -358,8 +431,14 @@ class PmserviceResource extends Resource
                                                 DatePicker::make('date_slot_04')
                                                     ->label('Date')
                                                     ->columnSpan(1),
+                                                TextInput::make('note_slot_04')
+                                                    ->label('Note')
+                                                    ->columnSpan(1),
                                                 DatePicker::make('date_slot_04_')
                                                     ->label('Date')
+                                                    ->columnSpan(1),
+                                                TextInput::make('note_slot_04_')
+                                                    ->label('Note')
                                                     ->columnSpan(1),
                                             ])
                                             ->columnSpan(1)
@@ -373,8 +452,14 @@ class PmserviceResource extends Resource
                                                 DatePicker::make('date_slot_05')
                                                     ->label('Date')
                                                     ->columnSpan(1),
+                                                TextInput::make('note_slot_05')
+                                                    ->label('Note')
+                                                    ->columnSpan(1),
                                                 DatePicker::make('date_slot_05_')
                                                     ->label('Date')
+                                                    ->columnSpan(1),
+                                                TextInput::make('note_slot_05_')
+                                                    ->label('Note')
                                                     ->columnSpan(1),
                                             ])
                                             ->columnSpan(1)
@@ -388,8 +473,14 @@ class PmserviceResource extends Resource
                                                 DatePicker::make('date_slot_06')
                                                     ->label('Date')
                                                     ->columnSpan(1),
+                                                TextInput::make('note_slot_06')
+                                                    ->label('Note')
+                                                    ->columnSpan(1),
                                                 DatePicker::make('date_slot_06_')
                                                     ->label('Date')
+                                                    ->columnSpan(1),
+                                                TextInput::make('note_slot_06_')
+                                                    ->label('Note')
                                                     ->columnSpan(1),
                                             ])
                                             ->columnSpan(1)
@@ -403,8 +494,14 @@ class PmserviceResource extends Resource
                                                 DatePicker::make('date_slot_07')
                                                     ->label('Date')
                                                     ->columnSpan(1),
+                                                TextInput::make('note_slot_07')
+                                                    ->label('Note')
+                                                    ->columnSpan(1),
                                                 DatePicker::make('date_slot_07_')
                                                     ->label('Date')
+                                                    ->columnSpan(1),
+                                                TextInput::make('note_slot_07_')
+                                                    ->label('Note')
                                                     ->columnSpan(1),
                                             ])
                                             ->columnSpan(1)
@@ -418,8 +515,14 @@ class PmserviceResource extends Resource
                                                 DatePicker::make('date_slot_08')
                                                     ->label('Date')
                                                     ->columnSpan(1),
+                                                TextInput::make('note_slot_08')
+                                                    ->label('Note')
+                                                    ->columnSpan(1),
                                                 DatePicker::make('date_slot_08_')
                                                     ->label('Date')
+                                                    ->columnSpan(1),
+                                                TextInput::make('note_slot_08_')
+                                                    ->label('Note')
                                                     ->columnSpan(1),
                                             ])
                                             ->columnSpan(1)
@@ -433,8 +536,14 @@ class PmserviceResource extends Resource
                                                 DatePicker::make('date_slot_09')
                                                     ->label('Date')
                                                     ->columnSpan(1),
+                                                TextInput::make('note_slot_09')
+                                                    ->label('Note')
+                                                    ->columnSpan(1),
                                                 DatePicker::make('date_slot_09_')
                                                     ->label('Date')
+                                                    ->columnSpan(1),
+                                                TextInput::make('note_slot_09_')
+                                                    ->label('Note')
                                                     ->columnSpan(1),
                                             ])
                                             ->columnSpan(1)
@@ -445,11 +554,17 @@ class PmserviceResource extends Resource
 
                                         Section::make('10th Month')
                                             ->schema([
-                                                DatePicker::make('date_slot_10')
+                                                DatePicker::make('date_slot_010')
                                                     ->label('Date')
                                                     ->columnSpan(1),
-                                                DatePicker::make('date_slot_10_')
+                                                TextInput::make('note_slot_010')
+                                                    ->label('Note')
+                                                    ->columnSpan(1),
+                                                DatePicker::make('date_slot_010_')
                                                     ->label('Date')
+                                                    ->columnSpan(1),
+                                                TextInput::make('note_slot_010_')
+                                                    ->label('Note')
                                                     ->columnSpan(1),
                                             ])
                                             ->columnSpan(1)
@@ -460,11 +575,17 @@ class PmserviceResource extends Resource
 
                                         Section::make('11th Month')
                                             ->schema([
-                                                DatePicker::make('date_slot_11')
+                                                DatePicker::make('date_slot_011')
                                                     ->label('Date')
                                                     ->columnSpan(1),
-                                                DatePicker::make('date_slot_11_')
+                                                TextInput::make('note_slot_011')
+                                                    ->label('Note')
+                                                    ->columnSpan(1),
+                                                DatePicker::make('date_slot_011_')
                                                     ->label('Date')
+                                                    ->columnSpan(1),
+                                                TextInput::make('note_slot_011_')
+                                                    ->label('Note')
                                                     ->columnSpan(1),
                                             ])
                                             ->columnSpan(1)
@@ -475,11 +596,17 @@ class PmserviceResource extends Resource
 
                                         Section::make('12th Month')
                                             ->schema([
-                                                DatePicker::make('date_slot_12')
+                                                DatePicker::make('date_slot_012')
                                                     ->label('Date')
                                                     ->columnSpan(1),
-                                                DatePicker::make('date_slot_12_')
+                                                TextInput::make('note_slot_012')
+                                                    ->label('Note')
+                                                    ->columnSpan(1),
+                                                DatePicker::make('date_slot_012_')
                                                     ->label('Date')
+                                                    ->columnSpan(1),
+                                                TextInput::make('note_slot_012_')
+                                                    ->label('Note')
                                                     ->columnSpan(1),
                                             ])
                                             ->columnSpan(1)
@@ -492,97 +619,242 @@ class PmserviceResource extends Resource
                                     ])->columns(4),
 
                                 Builder\Block::make('MONTHLY')
+                                    ->hidden(fn($get) => $get('../subscription') !== 'monthly')
                                     ->label(__('Monthly'))
                                     ->schema([
                                         DatePicker::make('date_slot_01')
                                             ->label('1st Month')
                                             ->columnSpan(1),
+                                        TextInput::make('note_slot_01')
+                                            ->label('Note')
+                                            ->columnSpan(1),
                                         DatePicker::make('date_slot_02')
                                             ->label('2nd Month')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_02')
+                                            ->label('Note')
                                             ->columnSpan(1),
                                         DatePicker::make('date_slot_03')
                                             ->label('3rd Month')
                                             ->columnSpan(1),
+                                        TextInput::make('note_slot_03')
+                                            ->label('Note')
+                                            ->columnSpan(1),
                                         DatePicker::make('date_slot_04')
                                             ->label('4th Month')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_04')
+                                            ->label('Note')
                                             ->columnSpan(1),
                                         DatePicker::make('date_slot_05')
                                             ->label('5th Month')
                                             ->columnSpan(1),
+                                        TextInput::make('note_slot_05')
+                                            ->label('Note')
+                                            ->columnSpan(1),
                                         DatePicker::make('date_slot_06')
                                             ->label('6th Month')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_06')
+                                            ->label('Note')
                                             ->columnSpan(1),
                                         DatePicker::make('date_slot_07')
                                             ->label('7th Month')
                                             ->columnSpan(1),
+                                        TextInput::make('note_slot_07')
+                                            ->label('Note')
+                                            ->columnSpan(1),
                                         DatePicker::make('date_slot_08')
                                             ->label('8th Month')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_08')
+                                            ->label('Note')
                                             ->columnSpan(1),
                                         DatePicker::make('date_slot_09')
                                             ->label('9th Month')
                                             ->columnSpan(1),
-                                        DatePicker::make('date_slot_10')
+                                        TextInput::make('note_slot_09')
+                                            ->label('Note')
+                                            ->columnSpan(1),
+                                        DatePicker::make('date_slot_010')
                                             ->label('10th Month')
                                             ->columnSpan(1),
-                                        DatePicker::make('date_slot_11')
+                                        TextInput::make('note_slot_010')
+                                            ->label('Note')
+                                            ->columnSpan(1),
+                                        DatePicker::make('date_slot_011')
                                             ->label('11th Month')
                                             ->columnSpan(1),
-                                        DatePicker::make('date_slot_12')
+                                        TextInput::make('note_slot_011')
+                                            ->label('Note')
+                                            ->columnSpan(1),
+                                        DatePicker::make('date_slot_012')
                                             ->label('12th Month')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_012')
+                                            ->label('Note')
                                             ->columnSpan(1),
 
                                     ])->columns(4),
 
                                 Builder\Block::make('QUARTERLY')
+                                    ->hidden(fn($get) => $get('../subscription') !== 'quarterly')
                                     ->label(__('Quarterly'))
                                     ->schema([
                                         DatePicker::make('date_slot_01')
                                             ->label('1st Quarter')
                                             ->columnSpan(1),
+                                        TextInput::make('note_slot_01')
+                                            ->label('Note')
+                                            ->columnSpan(1),
                                         DatePicker::make('date_slot_04')
                                             ->label('2nd Quarter')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_04')
+                                            ->label('Note')
                                             ->columnSpan(1),
                                         DatePicker::make('date_slot_07')
                                             ->label('3rd Quarter')
                                             ->columnSpan(1),
-                                        DatePicker::make('date_slot_10')
+                                        TextInput::make('note_slot_07')
+                                            ->label('Note')
+                                            ->columnSpan(1),
+                                        DatePicker::make('date_slot_010')
                                             ->label('4th Quarter')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_010')
+                                            ->label('Note')
                                             ->columnSpan(1),
                                     ])->columns(4),
 
                                 Builder\Block::make('SEMI-ANNUAL')
+                                    ->hidden(fn($get) => $get('../subscription') !== 'semi-annual')
                                     ->label(__('Semi Annual'))
                                     ->schema([
                                         DatePicker::make('date_slot_01')
                                             ->label('1st Half')
                                             ->columnSpan(1),
+                                        TextInput::make('note_slot_01')
+                                            ->label('Note')
+                                            ->columnSpan(1),
                                         DatePicker::make('date_slot_07')
                                             ->label('2nd Half')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_07')
+                                            ->label('Note')
                                             ->columnSpan(1),
                                     ])->columns(2),
 
                                 Builder\Block::make('ANNUAL')
+                                    ->hidden(fn($get) => $get('../subscription') !== 'annual')
                                     ->label(__('Yearly'))
                                     ->schema([
                                         DatePicker::make('date_slot_01')
                                             ->label('Date')
                                             ->columnSpanFull(),
+                                        TextInput::make('note_slot_01')
+                                            ->label('Note')
+                                            ->columnSpan(1),
                                     ]),
                                 Builder\Block::make('CONTINUOUS')
+                                    ->hidden(fn($get) => $get('../subscription') !== 'continuous')
                                     ->label(__('Continuous'))
                                     ->schema([
                                         DatePicker::make('date_slot_01')
-                                            ->label('Date')
-                                            ->columnSpanFull(),
-                                    ]),
+                                            ->label('1st Month')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_01')
+                                            ->label('Note')
+                                            ->columnSpan(1),
+                                        DatePicker::make('date_slot_02')
+                                            ->label('2nd Month')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_02')
+                                            ->label('Note')
+                                            ->columnSpan(1),
+                                        DatePicker::make('date_slot_03')
+                                            ->label('3rd Month')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_03')
+                                            ->label('Note')
+                                            ->columnSpan(1),
+                                        DatePicker::make('date_slot_04')
+                                            ->label('4th Month')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_04')
+                                            ->label('Note')
+                                            ->columnSpan(1),
+                                        DatePicker::make('date_slot_05')
+                                            ->label('5th Month')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_05')
+                                            ->label('Note')
+                                            ->columnSpan(1),
+                                        DatePicker::make('date_slot_06')
+                                            ->label('6th Month')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_06')
+                                            ->label('Note')
+                                            ->columnSpan(1),
+                                        DatePicker::make('date_slot_07')
+                                            ->label('7th Month')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_07')
+                                            ->label('Note')
+                                            ->columnSpan(1),
+                                        DatePicker::make('date_slot_08')
+                                            ->label('8th Month')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_08')
+                                            ->label('Note')
+                                            ->columnSpan(1),
+                                        DatePicker::make('date_slot_09')
+                                            ->label('9th Month')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_09')
+                                            ->label('Note')
+                                            ->columnSpan(1),
+                                        DatePicker::make('date_slot_010')
+                                            ->label('10th Month')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_010')
+                                            ->label('Note')
+                                            ->columnSpan(1),
+                                        DatePicker::make('date_slot_011')
+                                            ->label('11th Month')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_011')
+                                            ->label('Note')
+                                            ->columnSpan(1),
+                                        DatePicker::make('date_slot_012')
+                                            ->label('12th Month')
+                                            ->columnSpan(1),
+                                        TextInput::make('note_slot_012')
+                                            ->label('Note')
+                                            ->columnSpan(1),
+
+                                    ])->columns(4),
                             ])
                             ->columnSpanFull()
-                            ->blockPickerColumns(2)
+                            ->blockPickerColumns(1)
                             ->minItems(1)
                             ->maxItems(function ($get) {
-                                $subscription = $get('subscription');
-                                return $subscription === 'continuous' ? PHP_INT_MAX : 1;
+                                $contract = $get('contract_duration');
+
+                                switch ($contract) {
+                                    case 'Continuous':
+                                        return PHP_INT_MAX;
+                                    case '1 Year':
+                                        return 1;
+                                    case '2 Years':
+                                        return 2;
+                                    case '3 Years':
+                                        return 3;
+                                    default:
+                                        return 1; // Default value if no match
+                                }
                             })
+
                             ->blockNumbers(false)
                             ->reorderable(false)
                             ->addActionLabel('Add')
@@ -612,9 +884,26 @@ class PmserviceResource extends Resource
             ->deferLoading()
             ->recordUrl(null)
             ->striped()
+            ->persistSearchInSession()
+            ->persistColumnSearchesInSession()
+            // ->modifyQueryUsing(function (EloquentBuilder $query) {
+            //     $subQuery = DB::table('pmservices as sub')
+            //         ->select('project_id', DB::raw('MAX(COALESCE(renewal_date, start_date)) as latest_date'))
+            //         ->groupBy('project_id');
+
+            //     return $query
+            //         ->joinSub($subQuery, 'latest', function ($join) {
+            //             $join->on('pmservices.project_id', '=', 'latest.project_id')
+            //                 ->on('pmservices.start_date', '=', 'latest.latest_date')
+            //                 ->orOn('pmservices.renewal_date', '=', 'latest.latest_date');
+            //         })
+            //         ->orderBy('end_date', 'desc');
+            // })
+
             ->columns([
                 TextColumn::make('pm_project.name')
                     ->label('Project/Client')
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('contract_type')
                     ->label('Type')
@@ -623,65 +912,35 @@ class PmserviceResource extends Resource
                     ->color(fn(string $state): string => match ($state) {
                         'new' => 'success',
                         'renewal' => 'warning',
-                    }),
-                    TextColumn::make('contract_duration')
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('status')
+                    ->searchable()
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'active' => 'success',
+                        'inactive' => 'info',
+                        'cancelled' => 'warning',
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('contract_duration')
                     ->label('Period')
-                    ->searchable(),
-                    TextColumn::make('subscription')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                TextColumn::make('subscription')
                     ->label('Frequency')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
-                                    'bimonthly' => 'success',
-                                    'monthly' => 'success',
-                                    'quarterly' => 'warning',
-                                    'semi-annual' => 'warning',
-                                    'annual' => 'warning',
-                                    'continuous' => 'danger',
+                        'bimonthly' => 'success',
+                        'monthly' => 'success',
+                        'quarterly' => 'warning',
+                        'semi-annual' => 'warning',
+                        'annual' => 'warning',
+                        'continuous' => 'danger',
                     })
-                    ->searchable(),
-                    ViewColumn::make('dates_slots')->view('filament.table.pm-row-content')
-                    ->label('PM Served'),
-                // LayoutView::make('filament.table.pm-row-content'),
-                // TextColumn::make('pm_project.name')
-                //     ->label('Project/Client')
-                //     ->sortable(),
-                // TextColumn::make('contract_type')
-                //     ->label('Contract')
-                //     ->searchable()
-                //     ->badge()
-                //     ->color(fn(string $state): string => match ($state) {
-                //         'new' => 'success',
-                //         'renewal' => 'warning',
-                //     }),
-                // TextColumn::make('contract_duration')
-                //     ->label('Contract Period')
-                //     ->searchable(),
-                // TextColumn::make('subscription')
-                //     ->label('PM Frequency')
-                //     ->searchable(),
-                // SelectColumn::make('status')
-                //     ->options([
-                //         'active' => 'active',
-                //         'inactive' => 'inactive',
-                //         'cancelled' => 'cancelled',
-                //     ])
-                //     ->afterStateUpdated(function ($record, $state) {
-                //         if ($state === 'active') {
-                //             $record->status = 'active';
-                //         } elseif ($state === 'inactive') {
-                //             $record->status = 'inactive';
-                //         } elseif ($state === 'cancelled') {
-                //             $record->status = 'cancelled';
-                //         }
-
-                //         $record->save();
-                //     })
-                //     ->selectablePlaceholder(false),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('start_date')
-                    ->date()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('end_date')
                     ->date()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -689,16 +948,47 @@ class PmserviceResource extends Resource
                     ->date()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('end_date')
+                    ->date()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                ViewColumn::make('dates_slots')->view('filament.table.pm-row-content')
+                    ->label('PM Served'),
+
+
             ])
             ->filters([
-                //
+                SelectFilter::make('status')
+                    // ->default('active')
+                    ->options([
+                        'active' => 'active',
+                        'inactive' => 'inactive',
+                        'cancelled' => 'cancelled',
+                    ]),
+                SelectFilter::make('contract_type')
+                    ->label('Contract')
+                    ->options([
+                        'new' => 'New',
+                        'renewal' => 'Renewal',
+                    ]),
+
+                    TrashedFilter::make()
+                    ->hidden(auth()->user()->role !== 'ADMIN'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->label(' '),
+                Tables\Actions\ForceDeleteAction::make()
+                ->hidden(auth()->user()->role !== 'ADMIN'),
+                Tables\Actions\RestoreAction::make()
+                ->hidden(auth()->user()->role !== 'ADMIN'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                    ->hidden(auth()->user()->role !== 'ADMIN'),
+                    Tables\Actions\RestoreBulkAction::make()
+                    ->hidden(auth()->user()->role !== 'ADMIN'),
                 ]),
             ]);
     }

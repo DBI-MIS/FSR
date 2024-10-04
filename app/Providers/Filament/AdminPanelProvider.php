@@ -108,7 +108,7 @@ class AdminPanelProvider extends PanelProvider
             ->globalSearchDebounce('750ms')
             ->plugins([
                 FilamentGeneralSettingsPlugin::make()
-                    ->canAccess(fn() => User::find(1)->isAdmin())
+                    ->canAccess(fn() => auth()->user()->role === 'ADMIN')
                     ->setSort(19)
                     ->setIcon('heroicon-o-cog')
                     ->setNavigationGroup('Settings')

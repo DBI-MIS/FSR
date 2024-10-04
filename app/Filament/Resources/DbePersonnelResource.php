@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\DbePersonnelResource\Pages;
 use App\Filament\Resources\DbePersonnelResource\RelationManagers;
+use App\Filament\Resources\DbePersonnelResource\RelationManagers\FsrsRelationManager;
 use App\Models\DbePersonnel;
 use DiscoveryDesign\FilamentGaze\Forms\Components\GazeBanner;
 use Filament\Forms;
@@ -132,8 +133,18 @@ public static function getGlobalSearchResultActions(Model $record): array
             ->heading('DBE Personnels')
             ->defaultPaginationPageOption(25)
             ->deferLoading()
+            ->striped()
+            ->recordUrl(null)
             ->defaultSort('employee_status', 'asc')
             ->columns([
+
+                TextColumn::make('fsrs.fsr_no')
+                    ->label('FSR')
+                    ->default('No FSR Associated')
+                    ->listWithLineBreaks()
+                    ->limitList(3)
+                    ->expandableLimitedList()
+                    ->badge(),
 
                 TextColumn::make('id')
                     ->searchable(),
@@ -191,7 +202,7 @@ public static function getGlobalSearchResultActions(Model $record): array
     public static function getRelations(): array
     {
         return [
-            //
+           FsrsRelationManager::class,
         ];
     }
 

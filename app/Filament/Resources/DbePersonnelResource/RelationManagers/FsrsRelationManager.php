@@ -1,14 +1,12 @@
 <?php
 
-namespace App\Filament\Resources\EquipmentResource\RelationManagers;
+namespace App\Filament\Resources\DbePersonnelResource\RelationManagers;
 
 use App\Filament\Resources\FsrResource;
-use App\Models\Fsr;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
-use Filament\Tables\Actions\AttachAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -16,8 +14,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class FsrsRelationManager extends RelationManager
 {
     protected static string $relationship = 'fsrs';
-
-    protected static ?string $title = 'FSR No.';
 
     public function form(Form $form): Form
     {
@@ -30,17 +26,17 @@ class FsrsRelationManager extends RelationManager
             ->recordTitleAttribute('fsr_no')
             ->columns([
                 Tables\Columns\TextColumn::make('fsr_no')
-                ->label('FSR No.'),
+                    ->label('FSR No.'),
             ])
-            ->inverseRelationship('equipments')
+            ->inverseRelationship('personnels')
             ->filters([
                 //
             ])
             ->headerActions([
-                 // Tables\Actions\CreateAction::make(),
-                 Tables\Actions\AttachAction::make()
-                 ->preloadRecordSelect()
-                     ->multiple(),
+                // Tables\Actions\CreateAction::make(),
+                Tables\Actions\AttachAction::make()
+                ->preloadRecordSelect()
+                    ->multiple(),
             ])
             ->actions([
                 // Tables\Actions\EditAction::make(),
