@@ -2,11 +2,11 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\FsrEquipReplaceResource\RelationManagers\FsrsRelationManager;
 use App\Filament\Resources\ProjectResource\Pages;
 use App\Filament\Resources\ProjectResource\Pages\ViewEquipments;
 use App\Filament\Resources\ProjectResource\RelationManagers;
 use App\Filament\Resources\ProjectResource\RelationManagers\EquipmentProjectsRelationManager;
+use App\Filament\Resources\ProjectResource\RelationManagers\FsrsRelationManager;
 use App\Models\Equipment;
 use App\Models\Project;
 use App\Models\User;
@@ -105,7 +105,7 @@ public static function getGlobalSearchResultActions(Model $record): array
     {
         return $table
             ->heading('Projects / Clients')
-            ->defaultPaginationPageOption(25)
+            ->defaultPaginationPageOption(27)
             ->recordUrl(null)
             ->deferLoading()
             ->columns([
@@ -179,8 +179,8 @@ public static function getGlobalSearchResultActions(Model $record): array
     public static function getRelations(): array
     {
         return [
-            // EquipmentProjectsRelationManager::class,
-            // FsrsRelationManager::class
+            FsrsRelationManager::class,
+            
         ];
     }
 

@@ -9,6 +9,7 @@ use Illuminate\Support\ServiceProvider;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Filament\Support\Facades\FilamentView;
+use Filament\Tables\Table;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\View\WidgetsRenderHook;
 use Illuminate\Contracts\View\View;
@@ -51,6 +52,9 @@ class AppServiceProvider extends ServiceProvider
             'avatar' => asset('storage/' . $user->picture) ? asset('DB_LOGO_SOLO.svg') : null,
         ]);
 
+        Table::configureUsing(function (Table $table) {
+            $table->paginated([6, 12, 27, 51, 102]);
+        });
 
         // FilamentView::registerRenderHook(
         //     PanelsRenderHook::PAGE_START,

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ProjectResource\RelationManagers;
 
+use App\Filament\Resources\FsrResource;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -13,15 +14,10 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class FsrsRelationManager extends RelationManager
 {
     protected static string $relationship = 'fsrs';
-    protected static ?string $title = 'All FSR';
+
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('fsr_no')
-                    ->required()
-                    ->maxLength(255),
-            ]);
+        return FsrResource::form($form);
     }
 
     public function table(Table $table): Table
@@ -29,21 +25,29 @@ class FsrsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('fsr_no')
             ->columns([
-                Tables\Columns\TextColumn::make('fsr_no'),
+                Tables\Columns\TextColumn::make('fsr_no')
+                ->label('FSR No.'),
             ])
+            ->inverseRelationship('project')
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                // Tables\Actions\CreateAction::make(),
+                Tables\Actions\AssociateAction::make(),
+                // Tables\Actions\AttachAction::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                // Tables\Actions\EditAction::make(),
+                // Tables\Actions\DeleteAction::make(),
+                // Tables\Actions\DetachAction::make(),
+                Tables\Actions\DissociateAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    // Tables\Actions\DeleteBulkAction::make(),
+                    // Tables\Actions\DetachBulkAction::make(),
+                    Tables\Actions\DissociateBulkAction::make(),
                 ]),
             ]);
     }

@@ -36,11 +36,51 @@ class LatestFsr extends BaseWidget
             ->defaultSort('created_at', 'desc')
             ->columns([
                 View::make('filament.table.row-content')
-                    ->components([
-                        TextColumn::make('attended_to')
-                            ->badge()
-                            ->icon('heroicon-m-wrench'),
-                    ]),
+                ->components([
+                    TextColumn::make('attended_to')
+                        ->badge()
+                        ->icon(
+                            fn(string $state): string =>
+                            match ($state) {
+                                'Preventive Maintenance' => 'heroicon-m-wrench-screwdriver',
+                                'Trouble Call' => 'heroicon-m-exclamation-triangle',
+                                'Check Up' => 'heroicon-m-check-circle',
+                                'Evaluation' => 'heroicon-m-clipboard-document-check',
+                                'Start Up' => 'heroicon-m-forward',
+                                'Testing' => 'heroicon-m-swatch',
+                                'Commissioning' => 'heroicon-m-arrow-trending-up',
+                                'Monitoring' => 'heroicon-m-computer-desktop',
+                                'Site Inspection' => 'heroicon-m-magnifying-glass-plus',
+                                'Operatorship' => 'heroicon-m-user',
+                                'Parts/Installation' => 'heroicon-m-arrow-up-on-square-stack',
+                                'Repair/Modification' => 'heroicon-m-wrench-screwdriver',
+                                'Hauling' => 'heroicon-m-square-2-stack',
+                                'Delivery' => 'heroicon-m-truck',
+                                'Retrofitting' => 'heroicon-m-squares-plus',
+                                'Others' => 'heroicon-m-receipt-refund',
+                                default => 'heroicon-m-wrench',
+                            }
+                        )
+                        ->color(fn(string $state): string => match ($state) {
+                            'Preventive Maintenance' => 'primary',
+                            'Trouble Call' => 'danger',
+                            'Check Up' => 'warning',
+                            'Evaluation' => 'warning',
+                            'Start Up' => 'success',
+                            'Testing' => 'warning',
+                            'Commissioning' => 'primary',
+                            'Monitoring' => 'success',
+                            'Site Inspection' => 'success',
+                            'Operatorship' => 'primary',
+                            'Parts/Installation' => 'info',
+                            'Repair/Modification' => 'danger',
+                            'Hauling' => 'success',
+                            'Delivery' => 'success',
+                            'Retrofitting' => 'warning',
+                            'Others' => 'info',
+                            default => 'gray',
+                        })
+                ]),
                 View::make('filament.table.collapsible-row-content')
                     ->collapsible(),
 

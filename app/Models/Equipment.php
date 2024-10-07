@@ -15,14 +15,25 @@ class Equipment extends Model
         'serial',
     ];
 
-    public function projects()
-    {
-        return $this->belongsToMany(Project::class, 'equipment_projects')->withPivot(['order'])->withTimestamps();
-    }
+    // public function projects()
+    // {
+    //     return $this->belongsToMany(Project::class, 'equipment_projects')->withPivot(['order'])->withTimestamps();
+    // }
 
     public function fsrs()
     {
         return $this->belongsToMany(Fsr::class, 'fsr_equipments')->withPivot(['order'])->withTimestamps();
+    }
+
+      public function projects()
+    {
+        return $this->hasManyThrough(
+            Project::class, 
+            FsrEquipment::class, 
+            'fsr_id', 
+            'project_id', 
+            'id', 
+            'fsr_id');
     }
 
 

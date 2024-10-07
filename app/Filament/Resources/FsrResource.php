@@ -105,30 +105,30 @@ class FsrResource extends Resource
     protected static ?string $recordTitleAttribute = 'fsr_no';
 
     public static function getGloballySearchableAttributes(): array
-{
-    return ['fsr_no', 'project.name',];
-}
+    {
+        return ['fsr_no', 'project.name',];
+    }
 
-public static function getGlobalSearchResultDetails(Model $record): array
-{
-    return [
-        'FSR No.' => $record->fsr_no,
-        'Project' => $record->project->name,
-    ];
-}
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'FSR No.' => $record->fsr_no,
+            'Project' => $record->project->name,
+        ];
+    }
 
-public static function getGlobalSearchResultUrl(Model $record): string
-{
-    return FsrResource::getUrl('view', ['record' => $record]);
-}
+    public static function getGlobalSearchResultUrl(Model $record): string
+    {
+        return FsrResource::getUrl('view', ['record' => $record]);
+    }
 
-public static function getGlobalSearchResultActions(Model $record): array
-{
-    return [
-        Action::make('edit')
-            ->url(static::getUrl('edit', ['record' => $record])),
-    ];
-}
+    public static function getGlobalSearchResultActions(Model $record): array
+    {
+        return [
+            Action::make('edit')
+                ->url(static::getUrl('edit', ['record' => $record])),
+        ];
+    }
 
 
     public static function form(Form $form): Form
@@ -441,31 +441,31 @@ public static function getGlobalSearchResultActions(Model $record): array
                                 ->schema([
 
                                     Select::make('reading_for')
-                                ->options([
-                                    'Chiller' => 'Chiller',
-                                    'WCP' => 'WCP',
-                                    'AHU' => 'AHU',
-                                    'FCU' => 'FCU',
-                                    'ACP' => 'ACP',
-                                    'PECISION A/C' => 'PRECISION A/C',
-                                ])
-                                ->label('Select Equipment Type')
-                                ->nullable(),
-                            TextInput::make('refrigerant_type')
-                                // ->options([
-                                //     'R410a' => 'R410a',
-                                // ])
-                                ->nullable(),
+                                        ->options([
+                                            'Chiller' => 'Chiller',
+                                            'WCP' => 'WCP',
+                                            'AHU' => 'AHU',
+                                            'FCU' => 'FCU',
+                                            'ACP' => 'ACP',
+                                            'PECISION A/C' => 'PRECISION A/C',
+                                        ])
+                                        ->label('Select Equipment Type')
+                                        ->nullable(),
+                                    TextInput::make('refrigerant_type')
+                                        // ->options([
+                                        //     'R410a' => 'R410a',
+                                        // ])
+                                        ->nullable(),
 
-                            Select::make('compressor_type')
-                                ->options([
-                                    'Centrifugal' => 'Centrifugal',
-                                    'Rotary Screw' => 'Rotary Screw',
-                                    'HSC' => 'HSC',
-                                    'VSC' => 'VSC',
-                                    'Oilless Magnetic' => 'Oilless Magnetic',
-                                    'Scroll' => 'Scroll',
-                                ])->nullable()
+                                    Select::make('compressor_type')
+                                        ->options([
+                                            'Centrifugal' => 'Centrifugal',
+                                            'Rotary Screw' => 'Rotary Screw',
+                                            'HSC' => 'HSC',
+                                            'VSC' => 'VSC',
+                                            'Oilless Magnetic' => 'Oilless Magnetic',
+                                            'Scroll' => 'Scroll',
+                                        ])->nullable()
                                 ])->columnSpan(2),
 
                             Fieldset::make('Log Readings:')
@@ -866,7 +866,47 @@ public static function getGlobalSearchResultActions(Model $record): array
                     ->components([
                         TextColumn::make('attended_to')
                             ->badge()
-                            ->icon('heroicon-m-wrench'),
+                            ->icon(
+                                fn(string $state): string =>
+                                match ($state) {
+                                    'Preventive Maintenance' => 'heroicon-m-wrench-screwdriver',
+                                    'Trouble Call' => 'heroicon-m-exclamation-triangle',
+                                    'Check Up' => 'heroicon-m-check-circle',
+                                    'Evaluation' => 'heroicon-m-clipboard-document-check',
+                                    'Start Up' => 'heroicon-m-forward',
+                                    'Testing' => 'heroicon-m-swatch',
+                                    'Commissioning' => 'heroicon-m-arrow-trending-up',
+                                    'Monitoring' => 'heroicon-m-computer-desktop',
+                                    'Site Inspection' => 'heroicon-m-magnifying-glass-plus',
+                                    'Operatorship' => 'heroicon-m-user',
+                                    'Parts/Installation' => 'heroicon-m-arrow-up-on-square-stack',
+                                    'Repair/Modification' => 'heroicon-m-wrench-screwdriver',
+                                    'Hauling' => 'heroicon-m-square-2-stack',
+                                    'Delivery' => 'heroicon-m-truck',
+                                    'Retrofitting' => 'heroicon-m-squares-plus',
+                                    'Others' => 'heroicon-m-receipt-refund',
+                                    default => 'heroicon-m-wrench',
+                                }
+                            )
+                            ->color(fn(string $state): string => match ($state) {
+                                'Preventive Maintenance' => 'primary',
+                                'Trouble Call' => 'danger',
+                                'Check Up' => 'warning',
+                                'Evaluation' => 'warning',
+                                'Start Up' => 'success',
+                                'Testing' => 'warning',
+                                'Commissioning' => 'primary',
+                                'Monitoring' => 'success',
+                                'Site Inspection' => 'success',
+                                'Operatorship' => 'primary',
+                                'Parts/Installation' => 'info',
+                                'Repair/Modification' => 'danger',
+                                'Hauling' => 'success',
+                                'Delivery' => 'success',
+                                'Retrofitting' => 'warning',
+                                'Others' => 'info',
+                                default => 'gray',
+                            })
                     ]),
                 LayoutView::make('filament.table.collapsible-row-content')
                     ->collapsible(),
@@ -940,7 +980,7 @@ public static function getGlobalSearchResultActions(Model $record): array
 
 
                     Filter::make('attended_to')
-                
+
                         ->form([
                             TextInput::make('attended_to')->label('FSR Type')
                                 ->helperText('ex.: Preventive Maintenance, Trouble Call or Hauling'),
@@ -982,23 +1022,23 @@ public static function getGlobalSearchResultActions(Model $record): array
                     Tables\Actions\DeleteBulkAction::make(),
                     ExportBulkAction::make()->exports([
                         ExcelExport::make()
-                        ->askForFilename()
-                        ->withFilename(fn ($filename) => ''. $filename)
-                        ->withColumns([
-                            Column::make('fsr_no'),
-                            Column::make('time_arrived'),
-                            Column::make('time_completed'),
-                            Column::make('job_date_started')
-                            ->heading('Date Started'),
-                            Column::make('job_date_finished')
-                            ->heading('Date Finished'),
-                            Column::make('project.name')
-                            ->heading('Project Name'),
-                            Column::make('attended_to'),
-                            Column::make('encoder'),
-                        ])
+                            ->askForFilename()
+                            ->withFilename(fn($filename) => '' . $filename)
+                            ->withColumns([
+                                Column::make('fsr_no'),
+                                Column::make('time_arrived'),
+                                Column::make('time_completed'),
+                                Column::make('job_date_started')
+                                    ->heading('Date Started'),
+                                Column::make('job_date_finished')
+                                    ->heading('Date Finished'),
+                                Column::make('project.name')
+                                    ->heading('Project Name'),
+                                Column::make('attended_to'),
+                                Column::make('encoder'),
+                            ])
                     ])
-                    ->label('Export Selected')
+                        ->label('Export Selected')
                 ]),
             ]);
     }

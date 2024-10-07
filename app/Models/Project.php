@@ -58,6 +58,23 @@ class Project extends Model
         return $this->hasMany(Pmservice::class, 'project_id');
     }
 
+    public function equipments()
+    {
+        return $this->hasManyThrough(
+            Equipment::class, 
+            FsrEquipment::class, 
+            'equipment_id', 
+            'id', 
+            'id', 
+            'equipment_id',
+        );
+    }
+
+    // public function projects()
+    // {
+    //     return $this->hasManyThrough(Project::class, FsrEquipments::class, 'equipment_id', 'fsr_id', 'id', 'fsr_id');
+    // }
+
 
     // public function equipments()
     // {

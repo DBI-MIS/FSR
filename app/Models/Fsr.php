@@ -131,7 +131,7 @@ class Fsr extends Model
 
     public function equipments()
     {
-        return $this->belongsToMany(Equipment::class, 'fsr_equipments')->withPivot(['order'])->withTimestamps();
+        return $this->belongsToMany(Equipment::class, 'fsr_equipments', 'fsr_id', 'equipment_id')->withPivot(['order'])->withTimestamps();
     }
 
 
