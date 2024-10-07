@@ -9,7 +9,7 @@ class ProjectPie extends ChartWidget
 {
     protected int | string | array $columnSpan = '1';
     protected static bool $isLazy = true;
-    protected static ?string $maxHeight = '300px';
+    protected static ?string $maxHeight = '360px';
     protected static ?string $pollingInterval = null;
     protected static ?string $heading = 'Projects / Clients';
 
