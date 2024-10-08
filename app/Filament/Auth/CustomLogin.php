@@ -10,6 +10,9 @@ use Illuminate\Validation\ValidationException as ValidationValidationException;
 
 class CustomLogin extends Login
 {
+
+    protected static string $view = 'filament.custom-login';
+
     protected function getForms(): array
     {
         return [

@@ -111,5 +111,10 @@ class AppServiceProvider extends ServiceProvider
                 <link href="/pwa/icons/ios/192.png" sizes="192x192" rel="apple-touch-startup-image">
             ',
         );
+
+        FilamentView::registerRenderHook(
+            'panels::auth.login.form.before',
+            fn (): View => view('filament.custom-top-login')
+        );
     }
 }
