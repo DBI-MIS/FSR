@@ -36,9 +36,9 @@ class CreateFsr extends CreateRecord
     protected static bool $canCreateAnother = false;
     // protected static bool $canCreate = false;
     protected function getRedirectUrl(): string
-    {
-        return $this->getResource()::getUrl('index');
-    }
+{
+    return $this->previousUrl ?? $this->getResource()::getUrl('index');
+}
 
     protected function getSteps(): array
     {

@@ -18,7 +18,7 @@ class EditPmservice extends EditRecord
     }
 
     protected function getRedirectUrl(): string
-    {
-        return $this->getResource()::getUrl('index');
-    }
+{
+    return $this->previousUrl ?? $this->getResource()::getUrl('index');
+}
 }
