@@ -68,7 +68,7 @@
 
         </thead>
         <tbody>
-            <tr class="odd:bg-gray-100 even:bg-white">
+            <tr class="odd:bg-gray-100 even:bg-white ">
 
                 @if ($slot['type'] === 'BIMONTHLY')
                     @foreach (range(1, 24) as $i)
@@ -82,11 +82,11 @@
 
                         <td colspan="1">
                             <abbr title="{{ $date ? 'Served: ' . $date : 'Not yet served.' }}">
-                                <div class="{{ $date ? 'bg-blue-500' : 'bg-gray-300' }} h-5" style="width: 100%;">
+                                <div class="{{ $date ? 'bg-blue-500' : 'bg-gray-300' }} h-5 rounded-t-md hover:rounded-t-none transition-all ease-in-out" style="width: 100%;">
                                 </div>
                             </abbr>
                             <abbr title="{{ $note ? 'Note: ' . $note : '' }}">
-                                <div class="{{ $note ? 'bg-orange-500' : ($date ? 'bg-blue-500' : 'bg-gray-300') }} h-5"
+                                <div class="{{ $note ? 'bg-yellow-400' : ($date ? 'bg-blue-500' : 'bg-gray-300') }} h-5 rounded-b-md hover:rounded-b-none transition-all ease-in-out"
                                     style="width: 100%;"></div>
                             </abbr>
                         </td>
@@ -121,11 +121,11 @@
 
                 <td colspan="2">
                     <abbr title="{{ $date ? 'Served: ' . $date : 'Not yet served.' }}">
-                        <div class="{{ $date ? 'bg-blue-500' : 'bg-gray-300' }} h-5" style="width: 100%;">
+                        <div class="{{ $date ? 'bg-blue-500' : 'bg-gray-300' }} h-5 rounded-t-md hover:rounded-t-none transition-all ease-in-out" style="width: 100%;">
                         </div>
                     </abbr>
                     <abbr title="{{ $note ? 'Note: ' . $note : '' }}">
-                        <div class="{{ $note ? 'bg-orange-500' : ($date ? 'bg-blue-500' : 'bg-gray-300') }} h-5"
+                        <div class="{{ $note ? 'bg-yellow-400' : ($date ? 'bg-blue-500' : 'bg-gray-300') }} h-5 rounded-b-md hover:rounded-b-none transition-all ease-in-out"
                             style="width: 100%;"></div>
                     </abbr>
                 </td>
@@ -145,11 +145,11 @@
 
                 <td colspan="3">
                     <abbr title="{{ $date ? 'Served: ' . $date : 'Not yet served.' }}">
-                        <div class="{{ $date ? 'bg-blue-500' : 'bg-gray-300' }} h-5" style="width: 100%;">
+                        <div class="{{ $date ? 'bg-blue-500' : 'bg-gray-300' }} h-5 rounded-t-md hover:rounded-t-none transition-all ease-in-out" style="width: 100%;">
                         </div>
                     </abbr>
                     <abbr title="{{ $note ? 'Note: ' . $note : '' }}">
-                        <div class="{{ $note ? 'bg-orange-500' : ($date ? 'bg-blue-500' : 'bg-gray-300') }} h-5"
+                        <div class="{{ $note ? 'bg-yellow-400' : ($date ? 'bg-blue-500' : 'bg-gray-300') }} h-5 rounded-b-md hover:rounded-b-none transition-all ease-in-out"
                             style="width: 100%;"></div>
                     </abbr>
                 </td>
@@ -168,11 +168,11 @@
 
                 <td colspan="6">
                     <abbr title="{{ $date ? 'Served: ' . $date : 'Not yet served.' }}">
-                        <div class="{{ $date ? 'bg-blue-500' : 'bg-gray-300' }} h-5" style="width: 100%;">
+                        <div class="{{ $date ? 'bg-blue-500' : 'bg-gray-300' }} h-5 rounded-t-md hover:rounded-t-none transition-all ease-in-out" style="width: 100%;">
                         </div>
                     </abbr>
                     <abbr title="{{ $note ? 'Note: ' . $note : '' }}">
-                        <div class="{{ $note ? 'bg-orange-500' : ($date ? 'bg-blue-500' : 'bg-gray-300') }} h-5"
+                        <div class="{{ $note ? 'bg-yellow-400' : ($date ? 'bg-blue-500' : 'bg-gray-300') }} h-5 rounded-b-md hover:rounded-b-none transition-all ease-in-out"
                             style="width: 100%;"></div>
                     </abbr>
                 </td>
@@ -191,11 +191,11 @@
 
                 <td colspan="12">
                     <abbr title="{{ $date ? 'Served: ' . $date : 'Not yet served.' }}">
-                        <div class="{{ $date ? 'bg-blue-500' : 'bg-gray-300' }} h-5" style="width: 100%;">
+                        <div class="{{ $date ? 'bg-blue-500' : 'bg-gray-300' }} h-5 rounded-t-md hover:rounded-t-none transition-all ease-in-out" style="width: 100%;">
                         </div>
                     </abbr>
                     <abbr title="{{ $note ? 'Note: ' . $note : '' }}">
-                        <div class="{{ $note ? 'bg-orange-500' : ($date ? 'bg-blue-500' : 'bg-gray-300') }} h-5"
+                        <div class="{{ $note ? 'bg-yellow-400' : ($date ? 'bg-blue-500' : 'bg-gray-300') }} h-5 rounded-b-md hover:rounded-b-none transition-all ease-in-out"
                             style="width: 100%;"></div>
                     </abbr>
                 </td>
@@ -214,11 +214,11 @@
 
                 <td colspan="2">
                     <abbr title="{{ $date ? 'Served: ' . $date : 'Not yet served.' }}">
-                        <div class="{{ $date ? 'bg-blue-500' : 'bg-gray-300' }} h-5" style="width: 100%;">
+                        <div class="{{ $date ? 'bg-blue-500' : 'bg-gray-300' }} h-5 rounded-t-md hover:rounded-t-none transition-all ease-in-out" style="width: 100%;">
                         </div>
                     </abbr>
                     <abbr title="{{ $note ? 'Note: ' . $note : '' }}">
-                        <div class="{{ $note ? 'bg-orange-500' : ($date ? 'bg-blue-500' : 'bg-gray-300') }} h-5"
+                        <div class="{{ $note ? 'bg-yellow-400' : ($date ? 'bg-blue-500' : 'bg-gray-300') }} h-5 rounded-b-md hover:rounded-b-none transition-all ease-in-out"
                             style="width: 100%;"></div>
                     </abbr>
                 </td>

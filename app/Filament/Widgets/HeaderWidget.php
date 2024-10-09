@@ -22,7 +22,7 @@ class HeaderWidget extends Widget
 
         return [
             'currentTime' => Carbon::now(),
-            'user' => Auth()->user(),
+            // 'user' => Auth()->user(),
         ];
     }
 
