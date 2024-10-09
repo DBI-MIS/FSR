@@ -26,7 +26,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Infolists\Infolist;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\Layout\View as LayoutView;
 use Filament\Tables\Enums\ActionsPosition;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Parallax\FilamentComments\Infolists\Components\CommentsEntry;
@@ -108,30 +112,66 @@ public static function getGlobalSearchResultActions(Model $record): array
             ->defaultPaginationPageOption(27)
             ->recordUrl(null)
             ->deferLoading()
+            ->contentGrid([
+                'md' => 2,
+                'xl' => 3,
+            ])
             ->columns([
-                TextColumn::make('id')->sortable()
-                ->default('No Data'),
-                TextColumn::make('name')->searchable()
-                ->default('No Data')
-                ->searchable(),
-                TextColumn::make('address')
-                ->default('No Data'),
-                
-                // TextColumn::make('warranty')
+                // TextColumn::make('id')->sortable()
+                // ->default('No Data'),
+                // TextColumn::make('name')->searchable()
                 // ->default('No Data')
-                // ->badge()
-                // ->color(fn (string $state): string => match ($state) {
-                // 'Under Warranty' => 'success',
-                // 'Out of Warranty' => 'warning',
-                // 'In House' => 'info',
-                // })
+                // ->searchable(),
+                // TextColumn::make('address')
+                // ->default('No Data'),
+
+                LayoutView::make('filament.table.project-row-content'),
+                
             ])
             ->persistSortInSession()
             ->persistSearchInSession()
             ->persistColumnSearchesInSession()
             ->filters([
-                //
-            ])
+
+                Filter::make('Project')
+                        ->form([
+                            TextInput::make('name')->label('Project/Client')
+                                ->helperText('Search Project/Client only'),
+                        ])
+                        ->query(function (Builder $query, array $data): Builder {
+                            if (!empty($data['name'])) {
+                                $projectName = $data['name'];
+                                $query->where('name', 'like', '%' . $projectName . '%');
+                            }
+
+                            return $query;
+                        }),
+
+                        SelectFilter::make('warranty')
+                        ->label('Warranty')
+                        ->options([
+                            'Under Warranty' => 'Under Warranty',
+                            'Out of Warranty' => 'Out of Warranty',
+                            'In House' => 'In House',
+                        ])
+                        ->multiple(),
+
+                        Filter::make('Address')
+                        ->form([
+                            TextInput::make('address')->label('Address')
+                                ->helperText('Search Address only'),
+                        ])
+                        ->query(function (Builder $query, array $data): Builder {
+                            if (!empty($data['address'])) {
+                                $projectAddress = $data['address'];
+                                $query->where('address', 'like', '%' . $projectAddress . '%');
+                            }
+
+                            return $query;
+                        }),
+            ],
+            layout: FiltersLayout::AboveContent
+            )
             ->actions([
               
                 Tables\Actions\EditAction::make()
@@ -152,7 +192,7 @@ public static function getGlobalSearchResultActions(Model $record): array
                 ->icon('heroicon-o-clock')
                 ->url(fn (Project $record): string => route('filament.admin.resources.projects.history', $record->id))
            
-            ])
+            ],position: ActionsPosition::BeforeCells)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                 Tables\Actions\DeleteBulkAction::make(),

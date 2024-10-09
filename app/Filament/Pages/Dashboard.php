@@ -35,15 +35,11 @@ class Dashboard extends BaseDashboard
     {
 
         $user = Auth::user();
-        $hour = Carbon::now()->hour; // Get the current hour
+        // $hour = Carbon::now()->hour; // Get the current hour
     
-        if ($hour < 12) {
-            return 'Good morning '. ucwords(strtolower($user->name)) . '. Keep up the great work!';
-        } elseif ($hour < 18) {
-            return 'Good afternoon '. ucwords(strtolower($user->name)) . '. Let’s finish the day strong!';
-        } else {
-            return 'Good evening '. ucwords(strtolower($user->name)) . '. . .';
-        }
+      return 'Good day '. ucwords(strtolower($user->name)) . '. Keep up the great work!';
+    
+       
     }
 
     public function getColumns(): int | string | array
