@@ -34,7 +34,7 @@ class LatestFsr extends BaseWidget
     {
         return $table
             ->query(FsrResource::getEloquentQuery())
-            ->defaultPaginationPageOption(25)
+            ->defaultPaginationPageOption(12)
             ->defaultSort('created_at', 'desc')
             ->columns([
                 View::make('filament.table.row-content')

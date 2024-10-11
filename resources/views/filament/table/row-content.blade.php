@@ -58,7 +58,15 @@
 
 </div>
 <x-filament-tables::columns.layout :components="$getComponents()" :record="$getRecord()" :record-key="$recordKey"/>
-<div class="border-t-2 flex justify-end">
+<div class="border-t-2 flex justify-between">
+    <p class="text-slate-400">
+        <span class="font-light text-xs">
+            by:
+        </span>
+        <span class="text-xs font-bold">
+            {{ $getRecord()->author->name }}
+        </span>
+    </p>
    
     <p class="text-slate-400">
         <span class="font-light text-xs">

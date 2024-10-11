@@ -823,9 +823,14 @@ class FsrResource extends Resource
                                 ->columnSpan(3),
 
                             Select::make('user_id')
-                                ->disabled()
+                                ->disabled(auth()->user()->role !== 'ADMIN')
                                 ->relationship('author', 'name')
                                 ->default(Auth::user()->id)
+                                ->afterStateHydrated(function ($set) {
+                                    if (auth()->user()->role !== 'ADMIN') {
+                                        $set('user_id', Auth::user()->id);
+                                    }
+                                })
                                 // ->hidden()
                                 // ->searchable()
                                 ->required()
@@ -854,6 +859,9 @@ class FsrResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+        ->modifyQueryUsing(function (Builder $query) {
+            $query->orderByRaw('CASE WHEN updated_at > created_at THEN updated_at ELSE created_at END DESC');
+        })
             ->recordUrl(null)
             ->heading('FSR List')
             ->description('Click the funnel to filter the list.')
@@ -916,7 +924,7 @@ class FsrResource extends Resource
                 'md' => 2,
                 'xl' => 3,
             ])
-            ->defaultSort('fsr_no', 'desc')
+            // ->defaultSort('updated_at', 'desc')
             ->persistSortInSession()
             ->persistSearchInSession()
             ->persistColumnSearchesInSession()
