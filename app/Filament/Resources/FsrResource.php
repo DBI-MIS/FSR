@@ -143,7 +143,6 @@ class FsrResource extends Resource
                     ->columnSpanFull(),
                 Wizard::make([
 
-                    //////////////////////////////////////////////////////////////////////////////////            
                     Wizard\Step::make('FSR Details')
                         ->description(' ')
                         ->columns([
@@ -153,288 +152,343 @@ class FsrResource extends Resource
                             'lg' => 4,
                             'xl' => 4,
                         ])
-                        ->schema([
+                        ->schema(self::getFsrDetails()),
 
-                            TextInput::make('fsr_no')
-                                ->label('FSR No.')
-                                ->unique(ignoreRecord: true)
-                                ->disabledOn('edit')
-                                ->columnSpan([
-                                    'default' => 'full',
-                                    'sm' => 'full',
-                                    'md' => 1,
-                                    'lg' => 1,
-                                    'xl' => 1,
-                                ]),
-
-                            Select::make('project_id')
-                                ->live()
-                                ->label('Project/Client')
-                                ->relationship('project', 'name')
-                                ->searchable()
-                                ->columnSpan([
-                                    'default' => 'full',
-                                    'sm' => 'full',
-                                    'md' => 2,
-                                    'lg' => 2,
-                                    'xl' => 2,
-                                ])
-                                ->preload()
-                                ->nullable()
-                                ->createOptionForm([
-                                    TextInput::make('name')->autocapitalize('words'),
-                                    ToggleButtons::make('warranty')->inline()
-                                        ->options([
-                                            'Under Warranty' => 'Under Warranty',
-                                            'Out of Warranty' => 'Out of Warranty',
-                                            'In House' => 'In House',
-                                        ])
-                                        ->colors([
-                                            'Under Warranty' => 'success',
-                                            'Out of Warranty' => 'warning',
-                                            'In House' => 'info',
-                                        ]),
-                                    TextArea::make('address')->rows(5),
-                                ])->createOptionModalHeading('Create New Project'),
-
-                            Select::make('personnels')
-                                ->multiple()
-                                ->nullable()
-                                ->relationship('personnels', 'name')
-                                ->searchable()
-                                ->columnSpan([
-                                    'default' => 'full',
-                                    'sm' => 'full',
-                                    'md' => 1,
-                                    'lg' => 1,
-                                    'xl' => 1,
-                                ])
-                                ->preload()
-                                ->createOptionForm([
-                                    Section::make(' ')
-                                        ->description(' ')
-                                        ->schema([
-                                            FileUpload::make('profile_photo_path')
-                                                ->image()
-                                                ->avatar()
-                                                ->imageEditor()
-                                                ->circleCropper()
-                                                ->getUploadedFileNameForStorageUsing(
-                                                    fn(TemporaryUploadedFile $file): string => (string) str($file->getClientOriginalName())
-                                                        ->prepend('profile-photo-'),
-                                                )
-                                                ->label('Photo')
-                                                ->directory('profiles')
-                                                ->visibility('public')
-                                                ->nullable(),
-
-                                        ])->columnSpan(1),
-
-
-
-                                    Section::make(' ')
-                                        ->description(' ')
-                                        ->schema([
-                                            TextInput::make('name')
-                                                ->required(),
-                                            TextInput::make('designation')->nullable(),
-                                            ToggleButtons::make('employee_status')->inline()
-                                                ->options([
-                                                    'Active' => 'Active',
-                                                    'Inactive' => 'Inactive',
-                                                    'Resigned' => 'Resigned',
-                                                ])
-                                                ->colors([
-                                                    'Active' => 'success',
-                                                    'Inactive' => 'info',
-                                                    'Resigned' => 'warning',
-                                                ])
-                                                ->nullable(),
-
-
-                                        ])->columnSpan(3),
-                                ])->createOptionModalHeading('Create New Personnel'),
-
-                            DatePicker::make('job_date_started')
-                                ->label('Date Started')
-                                ->columnSpan([
-                                    'default' => 2,
-                                    'sm' => 'full',
-                                    'md' => 1,
-                                    'lg' => 2,
-                                    'xl' => 1,
-                                ])
-                                ->date()
-                                ->default('Carbon::today()'),
-                            TimePicker::make('time_arrived')
-                                ->label('Time Arrived')
-                                ->columnSpan([
-                                    'default' => 2,
-                                    'sm' => 'full',
-                                    'md' => 1,
-                                    'lg' => 2,
-                                    'xl' => 1,
-                                ])
-                                ->time()
-                                ->default(Carbon::now()),
-                            DatePicker::make('job_date_finished')
-                                ->label('Date Finished')
-                                ->columnSpan([
-                                    'default' => 2,
-                                    'sm' => 'full',
-                                    'md' => 1,
-                                    'lg' => 2,
-                                    'xl' => 1,
-                                ])
-                                ->date()
-                                ->default(Carbon::today()),
-                            TimePicker::make('time_completed')
-                                ->label('Time Completed')
-                                ->columnSpan([
-                                    'default' => 2,
-                                    'sm' => 'full',
-                                    'md' => 1,
-                                    'lg' => 2,
-                                    'xl' => 1,
-                                ])
-                                ->time()
-                                ->default(Carbon::now()),
-
-
-
-                            Select::make('attended_to')
-                                ->options([
-                                    'Preventive Maintenance' => 'Preventive Maintenance',
-                                    'Trouble Call' => 'Trouble Call',
-                                    'Check Up' => 'Check-up',
-                                    'Evaluation' => 'Evaluation',
-                                    'Start Up' => 'Start Up',
-                                    'Testing' => 'Testing',
-                                    'Commissioning' => 'Commissioning',
-                                    'Monitoring' => 'Monitoring',
-                                    'Site Inspection' => 'Site Inspection',
-                                    'Operatorship' => 'Operatorship',
-                                    'Parts/Installation' => 'Parts/Installation',
-                                    'Repair/Modification' => 'Repair/Modification',
-                                    'Hauling' => 'Hauling',
-                                    'Delivery' => 'Delivery',
-                                    'Retrofitting' => 'Retrofitting',
-                                    'Others' => 'Others',
-                                ])
-                                ->multiple()
-                                ->columnSpan(4)
-                                ->nullable(),
-
-                            MarkdownEditor::make('concerns')
-                                ->columnSpan(4)
-                                ->disableToolbarButtons([
-                                    'attachFiles',
-                                    'blockquote',
-                                    'bold',
-                                    // 'bulletList',
-                                    'codeBlock',
-                                    'heading',
-                                    'italic',
-                                    'link',
-                                    'orderedList',
-                                    'redo',
-                                    'strike',
-                                    'table',
-                                    'undo',
-                                ]),
-
-                        ]),
-                    //////////////////////////////////////////////////////////////////////////////////////////////////
                     Wizard\Step::make('Equipment')
                         ->description('Status')
                         ->columns(4)
-                        ->schema([
-                            Select::make('equipments')
-                                ->label(' ')
-                                ->columnSpan(4)
-                                ->multiple()
-                                ->relationship('equipments', 'model')
-                                ->searchable()
-                                ->nullable()
-                                ->getOptionLabelFromRecordUsing(fn(Equipment $record) => "{$record->brand} - {$record->model} | Serial No.:{$record->serial}")
-                                ->searchable(['brand', 'model', 'serial'])
-                                ->createOptionForm([
-                                    TextInput::make('brand')
-                                        ->nullable(),
-                                    TextInput::make('model')
-                                        ->required(),
-                                    TextInput::make('serial')
-                                        ->nullable(),
-                                    Textarea::make('description')
-                                        ->columnSpanFull()
-                                        ->nullable()
-                                        ->rows(3),
-                                ])->createOptionModalHeading('Create New Equipment'),
+                        ->schema(self::getEquipmentStatus()),
 
-                            Fieldset::make('Voltage')
-                                ->columns(3)
-                                ->schema([
-                                    TextInput::make('actual_voltage_v1')->nullable()
-                                        ->prefix('L1')
-                                        ->suffix('V')
-                                        ->label(' '),
-                                    TextInput::make('actual_voltage_v2')->nullable()
-                                        ->prefix('L2')
-                                        ->suffix('V')
-                                        ->label(' '),
-                                    TextInput::make('actual_voltage_v3')->nullable()
-                                        ->prefix('L3')
-                                        ->suffix('V')
-                                        ->label(' '),
-                                ])->columnSpan(2),
-
-                            Fieldset::make('Amperage')
-                                ->columns(3)
-                                ->schema([
-                                    TextInput::make('actual_amperage_v1')->nullable()
-                                        ->prefix('L1')
-                                        ->suffix('A')
-                                        ->label(' '),
-                                    TextInput::make('actual_amperage_v2')->nullable()
-                                        ->prefix('L2')
-                                        ->suffix('A')
-                                        ->label(' '),
-                                    TextInput::make('actual_amperage_v3')->nullable()
-                                        ->prefix('L3')
-                                        ->suffix('A')
-                                        ->label(' '),
-                                ])->columnSpan(2),
-                            Fieldset::make(' ')
-                                ->columns(3)
-                                ->schema([
-                                    TextInput::make('voltage_imbalance')->nullable(),
-                                    TextInput::make('current_imbalance')->nullable(),
-                                    TextInput::make('control_voltage')->nullable(),
-                                ])->columnSpan(4),
-                            MarkdownEditor::make('service_rendered')
-                                ->nullable()
-                                ->columnSpan(4)
-                                ->disableToolbarButtons([
-                                    'attachFiles',
-                                    'blockquote',
-                                    'bold',
-                                    // 'bulletList',
-                                    'codeBlock',
-                                    'heading',
-                                    'italic',
-                                    'link',
-                                    'orderedList',
-                                    'redo',
-                                    'strike',
-                                    'table',
-                                    'undo',
-                                ]),
-
-                        ]),
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////////
                     Wizard\Step::make('Log Readings-1')
                         ->description(' ')
-                        ->schema([
+                        ->schema(self::getLogReadings1()),
+
+                    Wizard\Step::make('Log Readings-2')
+                        ->description(' ')
+                        ->columns(2)
+                        ->schema(self::getLogReadings2()),
+
+                    Wizard\Step::make('Recommendations')
+                        ->columns(4)
+                        ->schema(self::getRecommendations()),
+
+                    Wizard\Step::make('Customer Satisfaction')
+                        ->columns(4)
+                        ->schema(self::getCustomerSatisfaction()),
+
+                ])
+                    ->skippable()
+                    ->columnSpanFull()
+
+                    ->submitAction(new HtmlString(Blade::render(<<<BLADE
+                                <x-filament::button
+                                    type="submit"
+                                    size="xl"
+                                >
+                                    Submit
+                                </x-filament::button>
+                            BLADE))),
+
+            ]);
+    }
+
+    public static function getFsrDetails(): array
+    {
+
+        return [
+
+                TextInput::make('fsr_no')
+                    ->label('FSR No.')
+                    ->unique(ignoreRecord: true)
+                    ->disabledOn('edit')
+                    ->columnSpan([
+                        'default' => 'full',
+                        'sm' => 'full',
+                        'md' => 1,
+                        'lg' => 1,
+                        'xl' => 1,
+                    ]),
+
+                Select::make('project_id')
+                    ->live()
+                    ->label('Project/Client')
+                    ->relationship('project', 'name')
+                    ->searchable()
+                    ->columnSpan([
+                        'default' => 'full',
+                        'sm' => 'full',
+                        'md' => 2,
+                        'lg' => 2,
+                        'xl' => 2,
+                    ])
+                    ->preload()
+                    ->nullable()
+                    ->createOptionForm([
+                        TextInput::make('name')->autocapitalize('words'),
+                        ToggleButtons::make('warranty')->inline()
+                            ->options([
+                                'Under Warranty' => 'Under Warranty',
+                                'Out of Warranty' => 'Out of Warranty',
+                                'In House' => 'In House',
+                            ])
+                            ->colors([
+                                'Under Warranty' => 'success',
+                                'Out of Warranty' => 'warning',
+                                'In House' => 'info',
+                            ]),
+                        TextArea::make('address')->rows(5),
+                    ])->createOptionModalHeading('Create New Project'),
+
+                Select::make('personnels')
+                    ->multiple()
+                    ->nullable()
+                    ->relationship('personnels', 'name')
+                    ->searchable()
+                    ->columnSpan([
+                        'default' => 'full',
+                        'sm' => 'full',
+                        'md' => 1,
+                        'lg' => 1,
+                        'xl' => 1,
+                    ])
+                    ->preload()
+                    ->createOptionForm([
+                        Section::make(' ')
+                            ->description(' ')
+                            ->schema([
+                                FileUpload::make('profile_photo_path')
+                                    ->image()
+                                    ->avatar()
+                                    ->imageEditor()
+                                    ->circleCropper()
+                                    ->getUploadedFileNameForStorageUsing(
+                                        fn(TemporaryUploadedFile $file): string => (string) str($file->getClientOriginalName())
+                                            ->prepend('profile-photo-'),
+                                    )
+                                    ->label('Photo')
+                                    ->directory('profiles')
+                                    ->visibility('public')
+                                    ->nullable(),
+
+                            ])->columnSpan(1),
+
+
+
+                        Section::make(' ')
+                            ->description(' ')
+                            ->schema([
+                                TextInput::make('name')
+                                    ->required(),
+                                TextInput::make('designation')->nullable(),
+                                ToggleButtons::make('employee_status')->inline()
+                                    ->options([
+                                        'Active' => 'Active',
+                                        'Inactive' => 'Inactive',
+                                        'Resigned' => 'Resigned',
+                                    ])
+                                    ->colors([
+                                        'Active' => 'success',
+                                        'Inactive' => 'info',
+                                        'Resigned' => 'warning',
+                                    ])
+                                    ->nullable(),
+
+
+                            ])->columnSpan(3),
+                    ])->createOptionModalHeading('Create New Personnel'),
+
+                DatePicker::make('job_date_started')
+                    ->label('Date Started')
+                    ->columnSpan([
+                        'default' => 2,
+                        'sm' => 'full',
+                        'md' => 1,
+                        'lg' => 2,
+                        'xl' => 1,
+                    ])
+                    ->date()
+                    ->default('Carbon::today()'),
+                TimePicker::make('time_arrived')
+                    ->label('Time Arrived')
+                    ->columnSpan([
+                        'default' => 2,
+                        'sm' => 'full',
+                        'md' => 1,
+                        'lg' => 2,
+                        'xl' => 1,
+                    ])
+                    ->time()
+                    ->default(Carbon::now()),
+                DatePicker::make('job_date_finished')
+                    ->label('Date Finished')
+                    ->columnSpan([
+                        'default' => 2,
+                        'sm' => 'full',
+                        'md' => 1,
+                        'lg' => 2,
+                        'xl' => 1,
+                    ])
+                    ->date()
+                    ->default(Carbon::today()),
+                TimePicker::make('time_completed')
+                    ->label('Time Completed')
+                    ->columnSpan([
+                        'default' => 2,
+                        'sm' => 'full',
+                        'md' => 1,
+                        'lg' => 2,
+                        'xl' => 1,
+                    ])
+                    ->time()
+                    ->default(Carbon::now()),
+
+
+
+                Select::make('attended_to')
+                    ->options([
+                        'Preventive Maintenance' => 'Preventive Maintenance',
+                        'Trouble Call' => 'Trouble Call',
+                        'Check Up' => 'Check-up',
+                        'Evaluation' => 'Evaluation',
+                        'Start Up' => 'Start Up',
+                        'Testing' => 'Testing',
+                        'Commissioning' => 'Commissioning',
+                        'Monitoring' => 'Monitoring',
+                        'Site Inspection' => 'Site Inspection',
+                        'Operatorship' => 'Operatorship',
+                        'Parts/Installation' => 'Parts/Installation',
+                        'Repair/Modification' => 'Repair/Modification',
+                        'Hauling' => 'Hauling',
+                        'Delivery' => 'Delivery',
+                        'Retrofitting' => 'Retrofitting',
+                        'Others' => 'Others',
+                    ])
+                    ->multiple()
+                    ->columnSpan(4)
+                    ->nullable(),
+
+                MarkdownEditor::make('concerns')
+                    ->columnSpan(4)
+                    ->disableToolbarButtons([
+                        'attachFiles',
+                        'blockquote',
+                        'bold',
+                        // 'bulletList',
+                        'codeBlock',
+                        'heading',
+                        'italic',
+                        'link',
+                        'orderedList',
+                        'redo',
+                        'strike',
+                        'table',
+                        'undo',
+                    ]),
+
+
+        ];
+    }
+
+    public static function getEquipmentStatus(): array
+    {
+
+        return [
+                Select::make('equipments')
+                    ->label(' ')
+                    ->columnSpan(4)
+                    ->multiple()
+                    ->relationship('equipments', 'model')
+                    ->searchable()
+                    ->nullable()
+                    ->getOptionLabelFromRecordUsing(fn(Equipment $record) => "{$record->brand} - {$record->model} | Serial No.:{$record->serial}")
+                    ->searchable(['brand', 'model', 'serial'])
+                    ->createOptionForm([
+                        TextInput::make('brand')
+                            ->nullable(),
+                        TextInput::make('model')
+                            ->required(),
+                        TextInput::make('serial')
+                            ->nullable(),
+                        Textarea::make('description')
+                            ->columnSpanFull()
+                            ->nullable()
+                            ->rows(3),
+                    ])->createOptionModalHeading('Create New Equipment'),
+
+                Fieldset::make('Voltage')
+                    ->columns(3)
+                    ->schema([
+                        TextInput::make('actual_voltage_v1')->nullable()
+                            ->prefix('L1')
+                            ->suffix('V')
+                            ->label(' ')
+                            ->columnSpan(3),
+                        TextInput::make('actual_voltage_v2')->nullable()
+                            ->prefix('L2')
+                            ->suffix('V')
+                            ->label(' ')
+                            ->columnSpan(3),
+                        TextInput::make('actual_voltage_v3')->nullable()
+                            ->prefix('L3')
+                            ->suffix('V')
+                            ->label(' ')
+                            ->columnSpan(3),
+                    ])->columnSpan(2),
+
+                Fieldset::make('Amperage')
+                    ->columns(3)
+                    ->schema([
+                        TextInput::make('actual_amperage_v1')->nullable()
+                            ->prefix('L1')
+                            ->suffix('A')
+                            ->label(' ')
+                            ->columnSpan(3),
+                        TextInput::make('actual_amperage_v2')->nullable()
+                            ->prefix('L2')
+                            ->suffix('A')
+                            ->label(' ')
+                            ->columnSpan(3),
+                        TextInput::make('actual_amperage_v3')->nullable()
+                            ->prefix('L3')
+                            ->suffix('A')
+                            ->label(' ')
+                            ->columnSpan(3),
+                    ])->columnSpan(2),
+                Fieldset::make(' ')
+                    ->columns(3)
+                    ->schema([
+                        TextInput::make('voltage_imbalance')->nullable(),
+                        TextInput::make('current_imbalance')->nullable(),
+                        TextInput::make('control_voltage')->nullable(),
+                    ])->columnSpan(4),
+                MarkdownEditor::make('service_rendered')
+                    ->nullable()
+                    ->columnSpan(4)
+                    ->disableToolbarButtons([
+                        'attachFiles',
+                        'blockquote',
+                        'bold',
+                        // 'bulletList',
+                        'codeBlock',
+                        'heading',
+                        'italic',
+                        'link',
+                        'orderedList',
+                        'redo',
+                        'strike',
+                        'table',
+                        'undo',
+                    ]),
+
+            
+
+        ];
+    }
+
+    public static function getLogReadings1(): array
+    {
+
+        return [
 
                             Fieldset::make('For')
                                 ->columns(3)
@@ -469,7 +523,7 @@ class FsrResource extends Resource
                                 ])->columnSpan(2),
 
                             Fieldset::make('Log Readings:')
-                                ->columns(3)
+                                ->columns(4)
                                 ->schema([
 
                                     Fieldset::make('Suction Pressure')
@@ -487,7 +541,8 @@ class FsrResource extends Resource
                                             TextInput::make('suction_pressure4')->nullable()
                                                 ->prefix('4')
                                                 ->label(' '),
-                                        ]),
+                                        ])
+                                        ->columnSpan(2),
 
                                     Fieldset::make('Discharge Pressure')
                                         ->columns(4)
@@ -504,7 +559,8 @@ class FsrResource extends Resource
                                             TextInput::make('discharge_pressure4')->nullable()
                                                 ->prefix('4')
                                                 ->label(' '),
-                                        ]),
+                                        ])
+                                        ->columnSpan(2),
 
                                     Fieldset::make('Oil Pressure')
                                         ->columns(4)
@@ -521,7 +577,8 @@ class FsrResource extends Resource
                                             TextInput::make('oil_pressure4')->nullable()
                                                 ->prefix('4')
                                                 ->label(' '),
-                                        ]),
+                                        ])
+                                        ->columnSpan(2),
 
                                     Fieldset::make('Suction Temperature')
                                         ->columns(4)
@@ -538,7 +595,8 @@ class FsrResource extends Resource
                                             TextInput::make('suction_temp4')->nullable()
                                                 ->prefix('4')
                                                 ->label(' '),
-                                        ]),
+                                        ])
+                                        ->columnSpan(2),
 
                                     Fieldset::make('Discharge Temperature')
                                         ->columns(4)
@@ -555,7 +613,8 @@ class FsrResource extends Resource
                                             TextInput::make('discharge_temp4')->nullable()
                                                 ->prefix('4')
                                                 ->label(' '),
-                                        ]),
+                                        ])
+                                        ->columnSpan(2),
 
                                     Fieldset::make('Liquid Temperature')
                                         ->columns(4)
@@ -572,7 +631,8 @@ class FsrResource extends Resource
                                             TextInput::make('liquid_temp4')->nullable()
                                                 ->prefix('4')
                                                 ->label(' '),
-                                        ]),
+                                        ])
+                                        ->columnSpan(2),
 
                                     Fieldset::make('Oil Temperature')
                                         ->columns(4)
@@ -589,7 +649,8 @@ class FsrResource extends Resource
                                             TextInput::make('oil_temp4')->nullable()
                                                 ->prefix('4')
                                                 ->label(' '),
-                                        ]),
+                                        ])
+                                        ->columnSpan(2),
 
                                     Fieldset::make('Discharge Superheat')
                                         ->columns(4)
@@ -606,16 +667,19 @@ class FsrResource extends Resource
                                             TextInput::make('discharge_superheat4')->nullable()
                                                 ->prefix('4')
                                                 ->label(' '),
-                                        ]),
+                                        ])
+                                        ->columnSpan(2),
 
                                 ])->columnSpan(2),
 
-                        ]),
-                    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    Wizard\Step::make('Log Readings-2')
-                        ->description(' ')
-                        ->columns(2)
-                        ->schema([
+
+        ];
+    }
+
+    public static function getLogReadings2(): array
+    {
+
+        return [
 
                             Fieldset::make(' ')
                                 ->columns(4)
@@ -625,10 +689,12 @@ class FsrResource extends Resource
                                         ->schema([
                                             TextInput::make('wcc_cooler_temp')->nullable()
                                                 ->suffix(' ')
-                                                ->label('Cooler'),
+                                                ->label('Cooler')
+                                                ->columnSpan(2),
                                             TextInput::make('wcc_condenser_temp')->nullable()
                                                 ->suffix(' ')
-                                                ->label('Condenser'),
+                                                ->label('Condenser')
+                                                ->columnSpan(2),
 
                                         ])->columnSpan(2),
 
@@ -637,10 +703,12 @@ class FsrResource extends Resource
                                         ->schema([
                                             TextInput::make('acc_cooler_temp')->nullable()
                                                 ->suffix(' ')
-                                                ->label('Temperature'),
+                                                ->label('Temperature')
+                                                ->columnSpan(2),
                                             TextInput::make('acc_ambient_temp')->nullable()
                                                 ->suffix(' ')
-                                                ->label('Ambient Temperature'),
+                                                ->label('Ambient Temperature')
+                                                ->columnSpan(2),
 
                                         ])->columnSpan(2),
 
@@ -659,7 +727,8 @@ class FsrResource extends Resource
                                             TextInput::make('pressure_condenser_water_out')->nullable()
                                                 ->suffix('Out')
                                                 ->label('Condenser'),
-                                        ]),
+                                        ])
+                                        ->columnSpan(2),
 
                                     Fieldset::make('Water Pressure Drop')
                                         ->columns(2)
@@ -668,90 +737,106 @@ class FsrResource extends Resource
                                                 ->label('Cooler'),
                                             TextInput::make('water_pressure_drop_condenser')->nullable()
                                                 ->label('Condenser'),
-                                        ]),
+                                        ])
+                                        ->columnSpan(2),
 
                                     Fieldset::make('Approach - Condenser')
                                         ->columns(2)
                                         ->schema([
                                             TextInput::make('approach_condenser_cooler_temp')->nullable()
-                                                ->label('Cooler'),
+                                                ->label('Cooler')
+                                                ->columnSpan(2),
                                             TextInput::make('approach_condenser_condenser_temp')->nullable()
-                                                ->label('Condenser'),
-                                        ]),
+                                                ->label('Condenser')
+                                                ->columnSpan(2),
+                                        ])
+                                        ->columnSpan(2),
 
                                     Fieldset::make('Approach - Evaporator')
                                         ->columns(2)
                                         ->schema([
                                             TextInput::make('approach_evaporator_cooler_temp')->nullable()
-                                                ->label('Cooler'),
+                                                ->label('Cooler')
+                                                ->columnSpan(2),
                                             TextInput::make('approach_evaporator_condenser_temp')->nullable()
-                                                ->label('Condenser'),
-                                        ]),
+                                                ->label('Condenser')
+                                                ->columnSpan(2),
+                                        ])
+                                        ->columnSpan(2),
 
                                 ]),
 
 
 
-                        ]),
-                    ////////////////////////////////////////////////////////////////////////////////////////////////
-                    Wizard\Step::make('Recommendations')
-                        ->columns(4)
-                        ->schema([
-                            Select::make('replacements')
-                                ->label('Part/s To Be Replace ')
-                                ->relationship('replacements', 'model')
-                                ->multiple()
-                                ->nullable()
-                                ->searchable()
-                                ->columnSpan(4)
-                                ->getOptionLabelFromRecordUsing(fn(FsrEquipReplace $record) => "{$record->brand} - {$record->model} | Part No.:{$record->part_no}")
-                                ->searchable(['brand', 'model', 'part_no'])
-                                ->preload()
-                                ->createOptionForm([
-                                    TextInput::make('part_quantity')
-                                        ->label('Qty')
-                                        ->numeric()
-                                        ->nullable()
-                                        ->columnSpan(1),
-                                    TextInput::make('brand')
-                                        ->nullable()
-                                        ->columnSpan(1),
-                                    TextInput::make('model')
-                                        ->nullable()
-                                        ->columnSpan(1),
-                                    TextInput::make('part_no')
-                                        ->nullable()
-                                        ->columnSpan(1),
-                                    TextArea::make('part_description')
-                                        ->nullable()
-                                        ->rows(2)
-                                        ->columnSpan(4),
-                                ])->createOptionModalHeading('Create Equipment for Replacement'),
 
-                            MarkdownEditor::make('recommendation')
-                                ->label('Recommendations / Existing Condition / For Customer Urgent Action')
-                                ->nullable()
-                                ->disableToolbarButtons([
-                                    'attachFiles',
-                                    'blockquote',
-                                    'bold',
-                                    // 'bulletList',
-                                    'codeBlock',
-                                    'heading',
-                                    'italic',
-                                    'link',
-                                    'orderedList',
-                                    'redo',
-                                    'strike',
-                                    'table',
-                                    'undo',
-                                ])
-                                ->columnSpan(4),
-                        ]),
-                    ///////////////////////////////////////////////////////////////////////////////////////////////////
-                    Wizard\Step::make('Customer Satisfaction')
-                        ->columns(4)
-                        ->schema([
+        ];
+    }
+
+    public static function getRecommendations(): array
+    {
+
+        return [
+
+                Select::make('replacements')
+                    ->label('Part/s To Be Replace ')
+                    ->relationship('replacements', 'model')
+                    ->multiple()
+                    ->nullable()
+                    ->searchable()
+                    ->columnSpan(4)
+                    ->getOptionLabelFromRecordUsing(fn(FsrEquipReplace $record) => "{$record->brand} - {$record->model} | Part No.:{$record->part_no}")
+                    ->searchable(['brand', 'model', 'part_no'])
+                    ->preload()
+                    ->createOptionForm([
+                        TextInput::make('part_quantity')
+                            ->label('Qty')
+                            ->numeric()
+                            ->nullable()
+                            ->columnSpan(1),
+                        TextInput::make('brand')
+                            ->nullable()
+                            ->columnSpan(1),
+                        TextInput::make('model')
+                            ->nullable()
+                            ->columnSpan(1),
+                        TextInput::make('part_no')
+                            ->nullable()
+                            ->columnSpan(1),
+                        TextArea::make('part_description')
+                            ->nullable()
+                            ->rows(2)
+                            ->columnSpan(4),
+                    ])->createOptionModalHeading('Create Equipment for Replacement'),
+
+                MarkdownEditor::make('recommendation')
+                    ->label('Recommendations / Existing Condition / For Customer Urgent Action')
+                    ->nullable()
+                    ->disableToolbarButtons([
+                        'attachFiles',
+                        'blockquote',
+                        'bold',
+                        // 'bulletList',
+                        'codeBlock',
+                        'heading',
+                        'italic',
+                        'link',
+                        'orderedList',
+                        'redo',
+                        'strike',
+                        'table',
+                        'undo',
+                    ])
+                    ->columnSpan(4),
+
+        ];
+    }
+
+    public static function getCustomerSatisfaction(): array
+    {
+
+        return [
+
+          
                             MarkdownEditor::make('response_time')
                                 ->nullable()
                                 ->columnSpan(3)
@@ -837,23 +922,8 @@ class FsrResource extends Resource
                                 ->preload()
                                 // ->readOnly()
                                 ->columnSpan(1),
-                        ]),
 
-                    ///////////////////////////////////////////////////////////////////////////////////////////////////
-                ])
-                    ->skippable()
-                    ->columnSpanFull()
-
-                    ->submitAction(new HtmlString(Blade::render(<<<BLADE
-                                <x-filament::button
-                                    type="submit"
-                                    size="xl"
-                                >
-                                    Submit
-                                </x-filament::button>
-                            BLADE))),
-
-            ]);
+        ];
     }
 
     public static function table(Table $table): Table
