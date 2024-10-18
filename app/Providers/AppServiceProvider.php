@@ -56,12 +56,12 @@ class AppServiceProvider extends ServiceProvider
             $table->paginated([6, 12, 27, 51, 102]);
         });
 
-        // FilamentView::registerRenderHook(
-        //     PanelsRenderHook::PAGE_START,
-        //     fn (array $scopes): View => view('filament.loader', ['scopes' => $scopes]),
-        //     // scopes: \App\Filament\Resources\DbeDirectoryResource::class,
-        //     scopes: \Livewire\Livewire::current(),
-        //     );
+        FilamentView::registerRenderHook(
+             PanelsRenderHook::PAGE_START,
+             fn (array $scopes): View => view('filament.loader', ['scopes' => $scopes]),
+             // scopes: \App\Filament\Resources\DbeDirectoryResource::class,
+             scopes: \Livewire\Livewire::current(),
+            );
 
 
         // FilamentView::registerRenderHook(
